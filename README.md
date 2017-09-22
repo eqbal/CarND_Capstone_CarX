@@ -17,6 +17,44 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
 * Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases/tag/v1.2).
 
+### Sections
+
+- **Waypoint Updater and Publisher** Node: 
+  - subscribes to `/base_waypoints` and `/current_pose` and publishes to `/final_waypoints`.
+  - Once you have correctly identified the traffic light and determined its position, you can convert it to a waypoint index and publish it.
+  - Use `/traffic_waypoint` to change the waypoint target velocities before publishing to `/final_waypoints`.
+
+- **DBW** Node: Once your waypoint updater is publishing `/final_waypoints`, the waypoint_follower node will start publishing messages to `the/twist_cmd` topic. At this point, you have everything needed to build the `dbw_node`. After completing this step, the car should drive in the simulator, ignoring the traffic lights.
+
+- **Traffic Light Detection and Classifier**:
+  - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
+  - Classifier: 
+
+
+### Roadmap
+
+  - Build the nodes described 
+  - Testing with the provided simulator
+  - Upload a video sample
+  - Update the README file to include the details
+
+### Contribution
+
+Each of the four team members in `Car-X` team should handle a sections. 
+
+Assuming `Eqbal` is handling the `dbw_node`:
+
+- Create a branch with the first two name initiative followed by the section name: `git checkout -b eq-dbw_node`
+
+- Commit the changes (better to have many comments with description description rather than one long commit)
+
+- Once you are stuck push your branch so everyone in the team can check out the updates ( *don't push the code all together once you are done but rather than incrementally keep pushing changes* ): `git push -u origin eq-dbw_node`
+
+- For testing please keep your python notebooks inside `./notebooks` folder.
+
+#### Project management tool
+
+
 ### Usage
 
 1. Clone the project repository
