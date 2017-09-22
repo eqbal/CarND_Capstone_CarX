@@ -52,7 +52,17 @@ Assuming `Eqbal` is handling the `dbw_node`:
 
 - For testing please keep your python notebooks inside `./notebooks` folder.
 
-#### Project management tool
+- Please don't apply the changes directly to `master`
+
+### Project management tool
+To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below: 
+
+
+### Team 
+  - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com)
+  - Jaime Blasco (pinoch0@gmail.com)
+  - Dimitrios Mavridis (dmavridis@gmail.com)
+  - Mani Srinivasan (srnimani@gmail.com)
 
 
 ### Usage
