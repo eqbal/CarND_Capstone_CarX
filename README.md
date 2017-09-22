@@ -57,6 +57,7 @@ Assuming `Eqbal` is handling the `dbw_node`:
 ### Project management tool
 To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below: 
 
+https://github.com/eqbal/CarND_Capstone_CarX/projects/1
 
 ### Team 
   - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com)
