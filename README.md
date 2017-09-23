@@ -1,13 +1,13 @@
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
-### Installation 
+### Installation
 
-* Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop). 
+* Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
 * If using a Virtual Machine to install Ubuntu, use the following configuration as minimum:
   * 2 CPU
   * 2 GB system memory
   * 25 GB of free hard drive space
-  
+
   The Udacity provided virtual machine has ROS and Dataspeed DBW already installed, so you can skip the next two steps if you are using this.
 
 * Follow these instructions to install ROS
@@ -19,7 +19,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 ### Sections
 
-- **Waypoint Updater and Publisher** Node: 
+- **Waypoint Updater and Publisher** Node:
   - subscribes to `/base_waypoints` and `/current_pose` and publishes to `/final_waypoints`.
   - Once you have correctly identified the traffic light and determined its position, you can convert it to a waypoint index and publish it.
   - Use `/traffic_waypoint` to change the waypoint target velocities before publishing to `/final_waypoints`.
@@ -28,19 +28,19 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 - **Traffic Light Detection and Classifier**:
   - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
-  - Classifier: 
+  - Classifier:
 
 
 ### Roadmap
 
-  - Build the nodes described 
+  - Build the nodes described
   - Testing with the provided simulator
   - Upload a video sample
   - Update the README file to include the details
 
 ### Contribution
 
-Each of the four team members in `Car-X` team should handle a sections. 
+Each of the four team members in `Car-X` team should handle a sections.
 
 Assuming `Eqbal` is handling the `dbw_node`:
 
@@ -55,15 +55,30 @@ Assuming `Eqbal` is handling the `dbw_node`:
 - Please don't apply the changes directly to `master`
 
 ### Project management tool
-To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below: 
+To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below:
 
 https://github.com/eqbal/CarND_Capstone_CarX/projects/1
 
-### Team 
+### Team
   - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com)
+
+	> Eki has already written a book about Ruby 5.0. It’s currently
+sealed up. In three years, Matz is going to open the book to see if the
+language design team got it right.
+
   - Jaime Blasco (pinoch0@gmail.com)
+	> Jaime's addition operator doesn't commute; it teleports to
+where he needs it to be
+
   - Dimitrios Mavridis (dmavridis@gmail.com)
+
+	> Dimitrios's code doesn't follow a coding convention. It is the coding convention.
+	
   - Mani Srinivasan (srnimani@gmail.com)
+	> Mani does not use revision control software. None of his code has ever needed revision.
+
+  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com)
+	> Volodymyr's coding reputation is only as modest as it is because of integer overflow (SQL Server does not have a datatype large enough)
 
 
 ### Usage
