@@ -10,6 +10,8 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
+import numpy as np
+import PyKDL
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -90,18 +92,55 @@ class TLDetector(object):
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
-    def get_closest_waypoint(self, pose):
+    def get_closest_waypoint(self, pose, waypts, direction):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
         Args:
             pose (Pose): position to match a waypoint to
+            waypts (list): list of waypoints to search
+            direction: direction for the visibility check - 'F' for waypoint search, 'R' for traffic light search
 
         Returns:
             int: index of the closest waypoint in self.waypoints
 
         """
-        #TODO implement
-        return 0
+        #DONE: implement
+
+        # O2 performance brute force search, consider optimizing!
+        best_distance = np.Inf
+        best_i = None
+        if self.waypoints:
+            for i, wpt in enumerate(waypts):
+                distance = (wpt.pose.pose.position.x-pose.position.x)**2 + (wpt.pose.pose.position.y-pose.position.y)**2
+                if distance < best_distance:
+                    # check for visibility:
+
+                    # pose quaternion
+                    p_q = PyKDL.Rotation.Quaternion(pose.orientation.x,
+                                                pose.orientation.y,
+                                                pose.orientation.z,
+                                                pose.orientation.w)
+                    # waypoint quaternion
+                    w_q = PyKDL.Rotation.Quaternion(wpt.pose.pose.orientation.x,
+                                                wpt.pose.pose.orientation.y,
+                                                wpt.pose.pose.orientation.z,
+                                                wpt.pose.pose.orientation.w)
+
+                    rot = p_q * w_q.Inverse()
+                    if direction == 'F':
+                        if np.abs(rot.GetRot()[2]) < np.pi/2.0:
+                            best_distance = distance
+                            best_i = i
+                    if direction == 'R':
+                        if np.abs(rot.GetRot()[2]) > np.pi/2.0:
+                            best_distance = distance
+                            best_i = i
+
+        # print(rot.GetRot())
+        # print("Best i: {} @ x: {}, y:{}".format(best_i, waypts[best_i].pose.pose.position.x, waypts[best_i].pose.pose.position.y))
+        import ipdb; ipdb.set_trace()
+
+        return best_i
 
 
     def project_to_image_plane(self, point_in_world):
@@ -163,6 +202,7 @@ class TLDetector(object):
         #Get classification
         return self.light_classifier.get_classification(cv_image)
 
+
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
             location and color
@@ -177,14 +217,17 @@ class TLDetector(object):
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose)
+            car_position = self.get_closest_waypoint(self.pose.pose, self.waypoints.waypoints, 'F')
 
         #TODO find the closest visible traffic light (if one exists)
+        # light_wp =
+
+        light = self.get_light_state()
 
         if light:
             state = self.get_light_state(light)
             return light_wp, state
-        self.waypoints = None
+        # self.waypoints = None
         return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':
