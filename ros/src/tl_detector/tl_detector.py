@@ -10,8 +10,12 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
+import math
+import sys
 
 STATE_COUNT_THRESHOLD = 3
+USE_CLASSIFIER = False
+
 
 class TLDetector(object):
     def __init__(self):
@@ -101,8 +105,59 @@ class TLDetector(object):
 
         """
         #TODO implement
-        return 0
 
+        if not self.waypoints or not self.waypoints.waypoints:
+            rospy.logerr("Waypoints empty")
+            return None
+
+        my_waypoints = self.waypoints.waypoints
+        rospy.logdebug("waypoints: {}".format(len(my_waypoints)))
+
+        pos_x = pose.position.x
+        pos_y = pose.position.y
+
+        current_distance = sys.maxsize
+        current_waypoint = None
+
+        #Lets find where we are using the euclidean distance
+        for i in range(0, len(my_waypoints)):
+            waypoint_pos_x = my_waypoints[i].pose.pose.position.x
+            waypoint_pos_y = my_waypoints[i].pose.pose.position.y
+            pos_distance = math.sqrt(math.pow(waypoint_pos_x - pos_x, 2) + 
+                                     math.pow(waypoint_pos_y - pos_y, 2))
+                                     
+            #find closest distance
+            if pos_distance < current_distance:
+                current_waypoint = i
+                current_distance = pos_distance
+
+        return current_waypoint
+
+    def get_closest_light(self, waypoint_i):
+
+        my_waypoints = self.waypoints.waypoints
+
+        #rospy.logwarn("waypoints: {}".format(len(my_waypoints)))
+
+        pos_x = my_waypoints[waypoint_i].pose.pose.position.x
+        pos_y = my_waypoints[waypoint_i].pose.pose.position.y
+
+        current_distance = sys.maxsize
+        current_light = None
+
+        #Lets find where we are using the euclidean distance
+        for i in range(0, len(self.lights)):
+            light_pos_x = self.lights[i].pose.pose.position.x
+            light_pos_y = self.lights[i].pose.pose.position.y
+            pos_distance = math.sqrt(math.pow(light_pos_x - pos_x, 2) + 
+                                     math.pow(light_pos_y - pos_y, 2))
+
+            #find closest distance
+            if pos_distance < current_distance:
+                current_light = i
+                current_distance = pos_distance
+
+        return current_light, current_distance
 
     def project_to_image_plane(self, point_in_world):
         """Project point from 3D world coordinates to 2D camera image location
@@ -176,15 +231,32 @@ class TLDetector(object):
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
+        #rospy.logwarn("Stop Line Positions: {}".format(len(stop_line_positions)))
         if(self.pose):
             car_position = self.get_closest_waypoint(self.pose.pose)
+            rospy.logdebug("Car position is x={} y={}".format(self.pose.pose.position.x, self.pose.pose.position.y))
+            if not car_position:
+                return -1, TrafficLight.UNKNOWN
+            rospy.logdebug("Current waypoint {}".format((car_position)))
 
-        #TODO find the closest visible traffic light (if one exists)
+            #TODO find the closest visible traffic light (if one exists)
+            current_light, current_distance = self.get_closest_light(car_position)
+            rospy.logdebug("Current light {}, distance: {}".format(current_light, current_distance))
 
-        if light:
-            state = self.get_light_state(light)
-            return light_wp, state
-        self.waypoints = None
+            light = self.lights[current_light]
+
+            #Get the waypoint closer to the next traffic light
+            light_wp = self.get_closest_waypoint(light.pose.pose)
+
+            if light:
+                if not USE_CLASSIFIER:
+                    state = self.lights[current_light].state
+                    rospy.loginfo("Current light state: {} at waypoint {}".format(state, light_wp))
+                else:
+                    state = self.get_light_state(light)
+                return light_wp, state
+                
+        #self.waypoints = None
         return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':
@@ -192,3 +264,5 @@ if __name__ == '__main__':
         TLDetector()
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start traffic node.')
+
+
