@@ -317,11 +317,23 @@ class TLDetector(object):
             rospy.logerr("Failed to find camera to map transform")
 
         #TODO Use tranform and rotation to calculate 2D position of light in image
+        # import ipdb; ipdb.set_trace()
+        f = 2300
+        x_offset = -30
+        y_offset = 340
+        fx = f
+        fy = f
+        piw = PyKDL.Vector(point_in_world.x,point_in_world.y,point_in_world.z)
+        R = PyKDL.Rotation.Quaternion(*rot)
+        T = PyKDL.Vector(*trans)
+        p_car = R*piw+T
 
-        x = 0
-        y = 0
+        # x = -p_car[1]/p_car[0]*fx+image_width/2
+        # y = -p_car[2]/p_car[0]*fx+image_height/2
+        x = -p_car[1]/p_car[0]*fx+image_width/2 + x_offset
+        y = -p_car[2]/p_car[0]*fx+image_height/2+y_offset
 
-        return (x, y)
+        return (int(x), int(y))
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -341,12 +353,10 @@ class TLDetector(object):
 
         # import ipdb; ipdb.set_trace()
         # TODO: impelement projection
-        # x, y = self.project_to_image_plane(light.pose.pose.position)
-        x = 100
-        y = 100
+        x, y = self.project_to_image_plane(light.pose.pose.position)
 
 
-        imm = cv2.circle(cv_image, (50,50), 10, (255,0,0), 4)
+        imm = cv2.circle(cv_image, (x,y), 10, (255,0,0), 4)
         image_message = self.bridge.cv2_to_imgmsg(imm, encoding="passthrough")
         self.image_viz.publish(image_message)
 
@@ -355,6 +365,10 @@ class TLDetector(object):
         #Get classification
         return self.light_classifier.get_classification(cv_image)
 
+    def publish_image(cv_image, x, y):
+        imm = cv2.circle(cv_image, (x,y), 10, (255,0,0), 4)
+        image_message = self.bridge.cv2_to_imgmsg(imm, encoding="passthrough")
+        self.image_viz.publish(image_message)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -401,9 +415,7 @@ class TLDetector(object):
                                                     # stop_line_positions, 'F', search_radius = 100.)
         stop_wp_i, _, _ = self.get_closest_waypoint(stop_line_positions[stop_i].pose.pose,
                                                     self.waypoints.waypoints)
-        # state = self.get_light_state(tl_i)
-        # state = self.lights[tl_i].
-        # state = TrafficLight.GREEN
+        state = self.get_light_state(self.lights[tl_i])
         state = self.lights[tl_i].state
 
 
