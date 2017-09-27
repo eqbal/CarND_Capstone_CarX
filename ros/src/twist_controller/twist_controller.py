@@ -25,7 +25,7 @@ class Controller(object):
         # TODO: Change the arg, kwarg list to suit your needs *** Mani Adds ***
         throttle    = args[0]
         steer       = args[1]
-        brake       = 0.0 // Currently set to zero..
+        brake       = 0.0  # Currently set to zero..
         
         # Return throttle, brake, steer
         return throttle, brake, steer
