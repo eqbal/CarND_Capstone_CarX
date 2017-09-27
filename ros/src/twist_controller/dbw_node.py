@@ -58,6 +58,12 @@ class DBWNode(object):
 
         # TODO: Subscribe to all the topics you need to
 
+
+        rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
+
+
+
+
         self.loop()
 
     def loop(self):
@@ -72,6 +78,8 @@ class DBWNode(object):
             #                                                     <any other argument you need>)
             # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
+
+            self.publish(0.3, 0, 0)
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
@@ -92,6 +100,10 @@ class DBWNode(object):
         bcmd.pedal_cmd = brake
         self.brake_pub.publish(bcmd)
 
+
+    def twist_cb(self, msg):
+        self.twist_cmd = msg
+        rospy.loginfo(msg.twist.linear.x)
 
 if __name__ == '__main__':
     DBWNode()
