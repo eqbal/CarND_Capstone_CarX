@@ -26,6 +26,11 @@ class TLDetector(object):
         self.camera_image = None
         self.lights = []
 
+        self.state = TrafficLight.UNKNOWN
+        self.last_state = TrafficLight.UNKNOWN
+        self.last_wp = -1
+        self.state_count = 0
+
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
@@ -55,55 +60,63 @@ class TLDetector(object):
         self.light_classifier = TLClassifier()
         self.listener = tf.TransformListener()
 
-        self.state = TrafficLight.UNKNOWN
-        self.last_state = TrafficLight.UNKNOWN
-        self.last_wp = -1
-        self.state_count = 0
 
         rospy.spin()
 
 
-    def visualize_tl_front(self, tl_i, color='G'):
+    def visualize_tl_front(self, pose, state='WP'):
         marker = Marker()
         marker.header.frame_id = "/world"
         # marker.type = marker.ARROW
         marker.type = marker.CUBE
-        if tl_i:
+        if pose:
             marker.action = marker.ADD
         else:
             marker.action = marker.DELETE
-        marker.scale.x = 100.2
-        marker.scale.y = 100.2
-        marker.scale.z = 300.2
+        marker.scale.x = 10.2
+        marker.scale.y = 10.2
+        marker.scale.z = 400.2
         marker.color.a = 1.0
-        if color == 'G':
+        if state == TrafficLight.GREEN:
             marker.color.r = 0.0
             marker.color.g = 1.0
             marker.color.b = 0.0
-        if color == 'Y':
-            marker.color.r = 0.0
+        if state == TrafficLight.YELLOW:
+            marker.color.r = 1.0
             marker.color.g = 1.0
-            marker.color.b = 1.0
-        if color == 'R':
+            marker.color.b = 0.0
+        if state == TrafficLight.RED:
             marker.color.r = 1.0
             marker.color.g = 0.0
             marker.color.b = 0.0
+
+        if state == 'WP':
+            marker.color.r = 1.0
+            marker.color.g = 1.0
+            marker.color.b = 1.0
+            marker.scale.x = 10.2
+            marker.scale.y = 10.2
+            marker.scale.z = 300.2
+            marker.id = 100000
+        else:
+            marker.id = 200000
 
         marker.pose.orientation.x = 0
         marker.pose.orientation.y = 0
         marker.pose.orientation.z = 0
         marker.pose.orientation.w = 1.0
-        if tl_i:
-            marker.pose.position.x = self.lights[tl_i].pose.pose.position.x
-            marker.pose.position.y = self.lights[tl_i].pose.pose.position.y
-            marker.pose.position.z = self.lights[tl_i].pose.pose.position.z
-        marker.id = 100000
+        if pose:
+            marker.pose.position.x = pose.position.x
+            marker.pose.position.y = pose.position.y
+            marker.pose.position.z = pose.position.z
         # print(" Display tl {}".format(marker))
 
         self.tl_front_viz.publish(marker)
+        return
 
 
     def pose_cb(self, msg):
+        # print(msg.pose.orientation.w)
         self.pose = msg
 
     def waypoints_cb(self, waypoints):
@@ -207,7 +220,7 @@ class TLDetector(object):
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
-    def get_closest_waypoint(self, pose, waypts, direction, search_radius = 50.0):
+    def get_closest_waypoint(self, pose, waypts, direction=None, search_radius = 300.0):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
         Args:
@@ -220,65 +233,56 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        #DONE: implement
-
         # O2 performance brute force search, consider optimizing!
         best_distance = np.Inf
         best_angle = None
         best_i = None
         if self.waypoints:
             for i, wpt in enumerate(waypts):
+                # import ipdb; ipdb.set_trace()
                 distance = np.sqrt((wpt.pose.pose.position.x-pose.position.x)**2 + (wpt.pose.pose.position.y-pose.position.y)**2)
                 if (distance < best_distance) and (distance < search_radius):
                     # check for visibility:
 
-                    # pose quaternion
-                    p_q = PyKDL.Rotation.Quaternion(pose.orientation.x,
-                                                pose.orientation.y,
-                                                pose.orientation.z,
-                                                pose.orientation.w)
-                    # waypoint quaternion
-                    w_q = PyKDL.Rotation.Quaternion(wpt.pose.pose.orientation.x,
-                                                wpt.pose.pose.orientation.y,
-                                                wpt.pose.pose.orientation.z,
-                                                wpt.pose.pose.orientation.w)
+                    if direction == 'F' or direction == 'R':
+                        # pose quaternion
+                        p_q = PyKDL.Rotation.Quaternion(pose.orientation.x,
+                                                    pose.orientation.y,
+                                                    pose.orientation.z,
+                                                    pose.orientation.w)
+                        # waypoint quaternion
+                        w_q = PyKDL.Rotation.Quaternion(wpt.pose.pose.orientation.x,
+                                                    wpt.pose.pose.orientation.y,
+                                                    wpt.pose.pose.orientation.z,
+                                                    wpt.pose.pose.orientation.w)
 
-                    # import ipdb; ipdb.set_trace()
+                        # import ipdb; ipdb.set_trace()
 
-                    # let's use scalar product to find the angle between the car orientation vector and car/base_point vector
-                    car_orientation = p_q * PyKDL.Vector(1.0, 0.0, 0.0)
-                    wp_vector = PyKDL.Vector(wpt.pose.pose.position.x-pose.position.x,
-                                             wpt.pose.pose.position.y-pose.position.y,
-                                             wpt.pose.pose.position.z-pose.position.z)
+                        # let's use scalar product to find the angle between the car orientation vector and car/base_point vector
+                        car_orientation = p_q * PyKDL.Vector(1.0, 0.0, 0.0)
+                        wp_vector = PyKDL.Vector(wpt.pose.pose.position.x-pose.position.x,
+                                                wpt.pose.pose.position.y-pose.position.y, 0.0)
 
-                    cos_angle = PyKDL.dot(car_orientation, wp_vector)/car_orientation.Norm()/wp_vector.Norm()
-                    angle = np.arccos(cos_angle)
+                        cos_angle = PyKDL.dot(car_orientation, wp_vector)/car_orientation.Norm()/wp_vector.Norm()
+                        angle = np.arccos(cos_angle)
 
-                    if direction == 'F':
-                        if angle < np.pi/2.0:
-                            best_distance = distance
-                            best_angle = angle
-                            best_i = i
-                    if direction == 'R':
-                        if angle > np.pi/2.0:
-                            best_distance = distance
-                            best_angle = angle
-                            best_i = i
-                    # rot = p_q * w_q.Inverse()
-                    # if direction == 'F':
-                    #     if np.abs(rot.GetRot()[2]) < np.pi/2.0:
-                    #         best_distance = distance
-                    #         best_angle = rot.GetRot()
-                    #         best_i = i
-                    # if direction == 'R':
-                    #     if np.abs(rot.GetRot()[2]) > np.pi/2.0:
-                    #         best_distance = distance
-                    #         best_angle = rot.GetRot()
-                    #         best_i = i
+                        if direction == 'F':
+                            if angle < np.pi/2.0:
+                                best_distance = distance
+                                best_angle = angle
+                                best_i = i
+                        if direction == 'R':
+                            if angle > np.pi/2.0:
+                                best_distance = distance
+                                best_angle = angle
+                                best_i = i
 
-        # print(rot.GetRot())
-        # print("Best i: {} @ x: {}, y:{}".format(best_i, waypts[best_i].pose.pose.position.x, waypts[best_i].pose.pose.position.y))
-        # import ipdb; ipdb.set_trace()
+                    else:
+                        angle = 0
+                        best_distance = distance
+                        best_angle = angle
+                        best_i = i
+
 
         return best_i, best_angle, best_distance
 
@@ -362,29 +366,51 @@ class TLDetector(object):
 
         """
         light = None
-        closest_tl_i = None
+        tl_i = None
 
         # List of positions that correspond to the line to stop in front of for a given intersection
-        stop_line_positions = self.config['stop_line_positions']
+        stop_line_positions_plain = self.config['stop_line_positions']
+        stop_line_positions = []
+
         if(self.pose):
-            # car_pos_wp_i, _, _ = self.get_closest_waypoint(self.pose.pose, self.waypoints.waypoints, 'F')
 
+            for st in stop_line_positions_plain:
+                s = TrafficLight()
+                s.pose.pose.position.x = st[0]
+                s.pose.pose.position.y = st[1]
+                s.pose.pose.position.z = 0
+                s.pose.pose.orientation.x = self.pose.pose.orientation.x
+                s.pose.pose.orientation.y = self.pose.pose.orientation.y
+                s.pose.pose.orientation.z = self.pose.pose.orientation.z
+                s.pose.pose.orientation.w = self.pose.pose.orientation.w
+                stop_line_positions.append(s)
         #DONE find the closest visible traffic light (if one exists)
-            closest_tl_i, a, d =  self.get_closest_waypoint(self.pose.pose, self.lights, 'F')
-
-            # if closest_tl_i:
-            #     print("Closest light: {}, angle: {}, d: {}".format(self.lights[closest_tl_i], a, d))
-
-        self.visualize_tl_front(closest_tl_i)
-
-        light = self.get_light_state(closest_tl_i)
+            tl_i, a, d =  self.get_closest_waypoint(self.pose.pose, self.lights, 'F')
 
 
-        if light:
-            state = self.get_light_state(light)
-            return light_wp, state
-        # self.waypoints = None
-        return -1, TrafficLight.UNKNOWN
+        if tl_i == None:
+            self.visualize_tl_front(None)
+            self.visualize_tl_front(None, 0)
+            return -1, TrafficLight.UNKNOWN
+
+        # print("angle: {}".format(a))
+
+        # import ipdb; ipdb.set_trace()
+        stop_i, _, _ = self.get_closest_waypoint(self.lights[tl_i].pose.pose,
+                                                    stop_line_positions)
+                                                    # stop_line_positions, 'F', search_radius = 100.)
+        stop_wp_i, _, _ = self.get_closest_waypoint(stop_line_positions[stop_i].pose.pose,
+                                                    self.waypoints.waypoints)
+        # state = self.get_light_state(tl_i)
+        # state = self.lights[tl_i].
+        # state = TrafficLight.GREEN
+        state = self.lights[tl_i].state
+
+
+        self.visualize_tl_front(self.waypoints.waypoints[stop_wp_i].pose.pose)
+        self.visualize_tl_front(self.lights[tl_i].pose.pose, state)
+
+        return stop_wp_i, state
 
 if __name__ == '__main__':
     try:
