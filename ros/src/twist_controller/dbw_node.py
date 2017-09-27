@@ -103,7 +103,7 @@ class DBWNode(object):
 
     def twist_cb(self, msg):
         self.twist_cmd = msg
-        rospy.loginfo(msg.twist.linear.x)
+#        rospy.loginfo(msg.twist.linear.x)
 
 if __name__ == '__main__':
     DBWNode()
