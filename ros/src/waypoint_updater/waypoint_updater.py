@@ -47,22 +47,40 @@ class WaypointUpdater(object):
         self.pose = msg
 
 
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
+
+        d = [] # temporary list to capture distance of waypoints from current position
+        # rospy.loginfo(self.pose)
+
+        if self.waypoints:
+            for waypoint in self.waypoints.waypoints: 
+                d.append(dl(waypoint.pose.pose.position, self.pose.pose.position))
+            self.point = np.argmin(d)
+
+            # rospy.loginfo(self.point)
+
+
+            l = Lane()
+            l.header = self.waypoints.header
+            l.waypoints = self.waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
+
+
+            # for i, w in enumerate(l.waypoints):
+            #     rospy.loginfo("Pose: %d: %d %d %d", i, w.pose.pose.position.x, w.pose.pose.position.y, w.pose.pose.position.z)
+            #     rospy.loginfo("Twist: %d: %d %d %d", i, w.twist.twist.linear.x, w.twist.twist.linear.y, w.twist.twist.linear.z)
+            self.final_waypoints_pub.publish(l)
+
+
+
+
     def waypoints_cb(self, waypoints):
         '''
         Finds the closest base waypoint position from the current car's position as an index
         Publishes the next LOOKAHEAD_WPS points
         '''
+        self.waypoints = waypoints
 
-        d = [] # temporary list to caprture x position of waypoints
-        
-        if self.pose:
-            for waypoint in waypoints.waypoints: 
-                d.append(abs(waypoint.pose.pose.position.x - self.pose.pose.position.x))
-            self.point = np.argmin(d)
-            l = Lane()
-            l.header = waypoints.header
-            l.waypoints = waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
-            self.final_waypoints_pub.publish(l)
+            
         
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
