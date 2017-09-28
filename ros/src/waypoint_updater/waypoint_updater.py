@@ -3,6 +3,7 @@
 import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
+from std_msgs.msg import Int32
 
 import math
 import numpy as np
@@ -30,6 +31,7 @@ class WaypointUpdater(object):
         self.pose = None      
         self.waypoints = None # the final waypoints
         self.point = None # Stores the waypoint index the car is closest to
+        self.traffic_point = None
         
         rospy.init_node('waypoint_updater')
         rospy.loginfo("Running init")
@@ -37,6 +39,11 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
+        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+
+
+
+
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
@@ -70,7 +77,9 @@ class WaypointUpdater(object):
             #     rospy.loginfo("Twist: %d: %d %d %d", i, w.twist.twist.linear.x, w.twist.twist.linear.y, w.twist.twist.linear.z)
             self.final_waypoints_pub.publish(l)
 
-
+            # i = len(l.waypoints)
+            # w = l.waypoints[-1]
+            # rospy.loginfo("Pose: %d: %d %d %d", i, w.pose.pose.position.x, w.pose.pose.position.y, w.pose.pose.position.z)
 
 
     def waypoints_cb(self, waypoints):
@@ -80,11 +89,12 @@ class WaypointUpdater(object):
         '''
         self.waypoints = waypoints
 
-            
+
         
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
-        pass
+     	self.traffic_point = msg
+     	rospy.loginfo(self.distance(self.waypoints.waypoints,self.point, self.traffic_point.data))
+
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
