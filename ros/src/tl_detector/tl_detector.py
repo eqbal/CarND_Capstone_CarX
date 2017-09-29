@@ -69,7 +69,7 @@ class TLDetector(object):
         marker.header.frame_id = "/world"
         # marker.type = marker.ARROW
         marker.type = marker.CUBE
-        if pose:
+        if pose and state!=TrafficLight.UNKNOWN:
             marker.action = marker.ADD
         else:
             marker.action = marker.DELETE
@@ -128,9 +128,9 @@ class TLDetector(object):
             # marker.type = marker.ARROW
             marker.type = marker.CUBE
             marker.action = marker.ADD
-            marker.scale.x = .2
-            marker.scale.y = .2
-            marker.scale.z = .2
+            marker.scale.x = 1.2
+            marker.scale.y = 1.2
+            marker.scale.z = 1.2
             marker.color.a = 1.0
             marker.color.r = 1.0
             marker.color.g = 1.0
@@ -144,7 +144,8 @@ class TLDetector(object):
             marker.pose.position.z = wpt.pose.pose.position.z
             # print(" Display tl {}".format(marker))
 
-            markerArray.markers.append(marker)
+            if i%50 == 0:
+                markerArray.markers.append(marker)
 
 
         id = 0
@@ -316,7 +317,7 @@ class TLDetector(object):
         except (tf.Exception, tf.LookupException, tf.ConnectivityException):
             rospy.logerr("Failed to find camera to map transform")
 
-        #TODO Use tranform and rotation to calculate 2D position of light in image
+        #DONE Use tranform and rotation to calculate 2D position of light in image
         # import ipdb; ipdb.set_trace()
         f = 2300
         x_offset = -30
@@ -349,21 +350,32 @@ class TLDetector(object):
             self.prev_light_loc = None
             return False
 
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         # import ipdb; ipdb.set_trace()
-        # TODO: impelement projection
+        # DONE: impelement projection
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
         x, y = self.project_to_image_plane(light.pose.pose.position)
+        if (x<0) or (y<0) or (x>=cv_image.shape[1]) or (y>=cv_image.shape[0]):
+            return False
 
 
-        imm = cv2.circle(cv_image, (x,y), 10, (255,0,0), 4)
-        image_message = self.bridge.cv2_to_imgmsg(imm, encoding="passthrough")
+        # imm = cv2.circle(cv_image, (x,y), 10, (255,0,0), 4)
+        imm = cv_image
+        crop = 90
+        xmin = x - crop if (x-crop) >= 0 else 0
+        ymin = y - crop if (y-crop) >= 0 else 0
+
+        # TODO:
+        xmax = x + crop if (x + crop) <= imm.shape[1]-1 else imm.shape[1]-1
+        ymax = y + crop if (y + crop) <= imm.shape[0]-1 else imm.shape[0]-1
+        imm_cropped = imm[ymin:ymax,xmin:xmax]
+        image_message = self.bridge.cv2_to_imgmsg(imm_cropped, encoding="passthrough")
         self.image_viz.publish(image_message)
 
         #TODO use light location to zoom in on traffic light in image
 
         #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        return self.light_classifier.get_classification(imm_cropped)
 
     def publish_image(cv_image, x, y):
         imm = cv2.circle(cv_image, (x,y), 10, (255,0,0), 4)
@@ -416,7 +428,7 @@ class TLDetector(object):
         stop_wp_i, _, _ = self.get_closest_waypoint(stop_line_positions[stop_i].pose.pose,
                                                     self.waypoints.waypoints)
         state = self.get_light_state(self.lights[tl_i])
-        state = self.lights[tl_i].state
+        # state = self.lights[tl_i].state
 
 
         self.visualize_tl_front(self.waypoints.waypoints[stop_wp_i].pose.pose)
