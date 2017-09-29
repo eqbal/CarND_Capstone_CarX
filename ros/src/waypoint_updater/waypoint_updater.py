@@ -5,7 +5,7 @@ from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
-
+import numpy as np
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
 
@@ -26,28 +26,44 @@ LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this n
 
 class WaypointUpdater(object):
     def __init__(self):
+        
+        self.pose = None      
+        self.waypoints = None # the final waypoints
+        self.point = None # Stores the waypoint index the car is closest to
+        
         rospy.init_node('waypoint_updater')
-
+        rospy.loginfo("Running init")
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-
-
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
-
+        
         rospy.spin()
 
     def pose_cb(self, msg):
-        # TODO: Implement
-        pass
+        self.pose = msg
+
 
     def waypoints_cb(self, waypoints):
-        # TODO: Implement
-        pass
+        '''
+        Finds the closest base waypoint position from the current car's position as an index
+        Publishes the next LOOKAHEAD_WPS points
+        '''
 
+        d = [] # temporary list to caprture x position of waypoints
+        
+        if self.pose:
+            for waypoint in waypoints.waypoints: 
+                d.append(abs(waypoint.pose.pose.position.x - self.pose.pose.position.x))
+            self.point = np.argmin(d)
+            l = Lane()
+            l.header = waypoints.header
+            l.waypoints = waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
+            self.final_waypoints_pub.publish(l)
+        
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
         pass
@@ -69,6 +85,7 @@ class WaypointUpdater(object):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
+    
 
 
 if __name__ == '__main__':
