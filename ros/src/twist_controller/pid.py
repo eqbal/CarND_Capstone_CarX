@@ -5,13 +5,13 @@ MAX_NUM = float('inf')
 
 class PID(object):
     def __init__(self, kp, ki, kd, mn=MIN_NUM, mx=MAX_NUM):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
+        self.kp	 = kp
+	self.ki  = ki
+	self.kd  = kd
         self.min = mn
         self.max = mx
 
-        self.int_val = self.last_int_val = self.last_error = 0.
+	self.int_val = self.last_int_val = self.last_error = 0.
 
     def reset(self):
         self.int_val = 0.0
