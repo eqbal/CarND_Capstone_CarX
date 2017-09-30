@@ -29,30 +29,27 @@ class WaypointUpdater(object):
     def __init__(self):
         
         self.pose = None      
-        self.waypoints = None # the final waypoints
+        self.waypoints = None # read waypoints
+        self.final_waypoints = None
         self.point = None # Stores the waypoint index the car is closest to
-        self.traffic_point = None
+        self.traffic_point = -1
+        self.red_light_ahead = 0
+        self.point_dist = 1
         
         rospy.init_node('waypoint_updater')
-        rospy.loginfo("Running init")
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
-
-
-
+        # rospy.Subscriber('/obstacle_waypoint', PoseStamped, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-
-        # TODO: Add other member variables you need below
         
         rospy.spin()
 
     def pose_cb(self, msg):
         self.pose = msg
-
 
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
 
@@ -63,24 +60,31 @@ class WaypointUpdater(object):
             for waypoint in self.waypoints.waypoints: 
                 d.append(dl(waypoint.pose.pose.position, self.pose.pose.position))
             self.point = np.argmin(d)
-
-            # rospy.loginfo(self.point)
-
-
-            l = Lane()
-            l.header = self.waypoints.header
-            l.waypoints = self.waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
+            self.Publish()
 
 
-            # for i, w in enumerate(l.waypoints):
-            #     rospy.loginfo("Pose: %d: %d %d %d", i, w.pose.pose.position.x, w.pose.pose.position.y, w.pose.pose.position.z)
-            #     rospy.loginfo("Twist: %d: %d %d %d", i, w.twist.twist.linear.x, w.twist.twist.linear.y, w.twist.twist.linear.z)
-            self.final_waypoints_pub.publish(l)
+    def Publish(self):
 
-            # i = len(l.waypoints)
-            # w = l.waypoints[-1]
-            # rospy.loginfo("Pose: %d: %d %d %d", i, w.pose.pose.position.x, w.pose.pose.position.y, w.pose.pose.position.z)
+        # Final waypoint ground truth data
+        self.final_waypoints = self.waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
 
+
+        # Update if there is a traffic light event
+
+        self.red_light_ahead = (self.traffic_point.data != -1) & (self.point <= self.traffic_point.data)
+        if self.red_light_ahead:
+            self.point_dist = self.traffic_point.data - self.point
+            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
+                self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
+        else:
+            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
+                self.set_waypoint_velocity(self.final_waypoints, ii, 11)
+
+
+        l = Lane()
+        l.header = self.waypoints.header
+        l.waypoints = self.final_waypoints
+        self.final_waypoints_pub.publish(l)
 
     def waypoints_cb(self, waypoints):
         '''
@@ -89,11 +93,9 @@ class WaypointUpdater(object):
         '''
         self.waypoints = waypoints
 
-
         
     def traffic_cb(self, msg):
      	self.traffic_point = msg
-     	rospy.loginfo(self.distance(self.waypoints.waypoints,self.point, self.traffic_point.data))
 
 
     def obstacle_cb(self, msg):
