@@ -11,23 +11,24 @@ MAX_SPEED   = 40.0
 
 
 class Controller(object):
-    def __init__(self, *args, **kwargs):
-       
-        self.throttle_pid   = PID(kwargs['throttle_kp'], kwargs['throttle_ki'], kwargs['throttle_kd'])
-        self.yaw_control    = YawController(
-                                     kwargs['wheel_base'],
-                                     kwargs['steer_ratio'],
-                                     kwargs['min_speed'],
-                                     kwargs['max_lat_accel'],
-                                     kwargs['max_steer_angle'])
+    def __init__(self, vehicle_mass, wheel_radius, decel_limit, wheel_base, steer_ratio, max_lat_accel, max_steer_angle, Kp, Ki, Kd):
+        
+        min_speed           = 1.0 * ONE_MPH
+        self.throttle_pid   = PID(Kp, Ki, Kd)
+        self.yaw_control    = YawController(wheel_base, steer_ratio, min_speed, max_lat_accel, max_steer_angle)
+     
+        self.v_mass         = vehicle_mass
+        self.w_radius       = wheel_radius
+        self.d_limit        = decel_limit
 
         self.last_time      = None
 
 
     def control(self, target_v, target_omega, current_v, dbw_enabled):
 
+        # Calculate the desired throttle based on target_v, target_omega and current_v
         # target_v and target_omega are desired linear and angular velocities
-
+        
         if self.last_time is None or not dbw_enabled:
             self.last_time = time.time()
             return 0.0, 0.0, 0.0
@@ -38,14 +39,33 @@ class Controller(object):
 
         throttle = self.throttle_pid.step(error, dt)
         
+        # Max throttle is 1.0
+        if throttle > 1.0:
+            throttle = 1.0
+        
+        print ("Throttle :", throttle)
+        
+        # Brake or decelerate only if the target velocity is lower than the current velocity
+        # Brake value is in N/m and is calculated using car mass, acceleration and wheel rasius
+        # longitudinal force = mass of car * acceleration (or deceleration)
+        # Torque = longitudinal force * wheel radius
+        
         if error < 0: # Needs to decelerate
-            brake = -10.0 * error   
+            deceleration        = (target_v.x - current_v.x) / dt
+            longitudinal_force  = v_mass * deceleration
+            brake               = longitudinal_force * w_radius
+            if brake < d_limit:
+                brake = - 5   # Limited to decelartion limits
             throttle = 0.0
         else:
             brake = 0.0
 
-        steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
+        print ("Brake :", brake)
+        
+        # Steering control is using Yaw Control..
 
+        steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
+        print ("Steering :", steer)
         self.last_time = time.time()
 	
 	return throttle, brake, steer
