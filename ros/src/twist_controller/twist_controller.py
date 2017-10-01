@@ -52,9 +52,9 @@ class Controller(object):
         
         if error < 0: # Needs to decelerate
             deceleration        = (target_v.x - current_v.x) / dt
-            longitudinal_force  = v_mass * deceleration
-            brake               = longitudinal_force * w_radius
-            if brake < d_limit:
+            longitudinal_force  = self.v_mass * deceleration
+            brake               = longitudinal_force * self.w_radius
+            if brake < self.d_limit:
                 brake = - 5   # Limited to decelartion limits
             throttle = 0.0
         else:

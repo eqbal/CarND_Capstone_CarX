@@ -45,9 +45,9 @@ class DBWNode(object):
         max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
 
         # PID Control Inits
-        throttle_kp     = 0.0
-        throttle_ki	    = 0.0
-        throttle_kd     = 0.0
+        throttle_kp     = 0.3
+        throttle_ki	    = 0.003
+        throttle_kd     = 4.0
 
         # Publishers
         self.steer_pub 	  = rospy.Publisher('/vehicle/steering_cmd', SteeringCmd, queue_size=1)
@@ -95,7 +95,7 @@ class DBWNode(object):
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
-        rospy.loginfo("publishing Throttle %f, Brake %f, Steer %f", throttle, brake, steer)
+        #rospy.loginfo("publishing Throttle %f, Brake %f, Steer %f", throttle, brake, steer)
         
         tcmd = ThrottleCmd()
         tcmd.enable = True
@@ -116,14 +116,14 @@ class DBWNode(object):
 
 
     def dbw_cb(self, msg):
-        rospy.loginfo("DBW status changed to: %s", msg)
+        #rospy.loginfo("DBW status changed to: %s", msg)
         self.dbw_enabled = msg
 
     def vel_cb(self, msg):
         self.current_velocity = msg
 
     def twist_cb(self, msg):
-        rospy.loginfo("Received twist command %s", msg)
+        #rospy.loginfo("Received twist command %s", msg)
         self.twist_cmd = msg
 
 if __name__ == '__main__':
