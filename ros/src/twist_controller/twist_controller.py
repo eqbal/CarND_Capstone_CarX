@@ -13,12 +13,13 @@ MAX_SPEED   = 40.0
 class Controller(object):
     def __init__(self, *args, **kwargs):
        
-	self.throttle_pid = PID(kwargs['throttle_kp'], kwargs['throttle_ki'], kwargs['throttle_kd'])	      
-	self.yaw_control = YawController(kwargs['wheel_base'], 
-					 kwargs['steer_ratio'],
-                                         kwargs['min_speed'], 
-					 kwargs['max_lat_accel'],
-                                         kwargs['max_steer_angle'])
+        self.throttle_pid = PID(kwargs['throttle_kp'], kwargs['throttle_ki'], kwargs['throttle_kd'])
+        self.yaw_control = YawController(
+                                     kwargs['wheel_base'],
+                                     kwargs['steer_ratio'],
+                                     kwargs['min_speed'],
+                                     kwargs['max_lat_accel'],
+                                     kwargs['max_steer_angle'])
 
         self.last_time = None
 
@@ -45,7 +46,7 @@ class Controller(object):
         else:
             brake = 0.0
 
-	steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
+        steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
 
         self.last_time = time.time()
 	

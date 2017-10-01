@@ -35,17 +35,15 @@ class DBWNode(object):
         decel_limit 	= rospy.get_param('~decel_limit', -5)
         accel_limit 	= rospy.get_param('~accel_limit', 1.)
         wheel_radius 	= rospy.get_param('~wheel_radius', 0.2413)
-        wheel_base 	= rospy.get_param('~wheel_base', 2.8498)
+        wheel_base 	    = rospy.get_param('~wheel_base', 2.8498)
         steer_ratio 	= rospy.get_param('~steer_ratio', 14.8)
         max_lat_accel 	= rospy.get_param('~max_lat_accel', 3.)
         max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
 
-	# PID Control Inits
-
-	throttle_kp	= 0.0
-	throttle_ki	= 0.0
-	throttle_Kd	= 0.0
-
+        # PID Control Inits
+        throttle_kp     = 0.0
+        throttle_ki	    = 0.0
+        throttle_kd     = 0.0
 
         # Publishers
         self.steer_pub 	  = rospy.Publisher('/vehicle/steering_cmd', SteeringCmd, queue_size=1)
@@ -54,15 +52,15 @@ class DBWNode(object):
 
         # TODO: Pass params to `Controller` constructor
 
-	self.controller = Controller(
-				wheel_base=wheel_base, 
-				steer_ratio=steer_ratio, 
-				min_speed = 1.0 * 0.447,
-                                max_lat_accel = max_lat_accel, 
-				max_steer_angle=max_steer_angle,
-				throttle_kp = throttle_kp,
-				throttle_ki = throttle_ki,
-				throttle_kd = throttle_kd)
+        self.controller = Controller(
+                                     wheel_base=wheel_base,
+                                     steer_ratio=steer_ratio,
+                                     min_speed = 1.0 * 0.447,
+                                     max_lat_accel = max_lat_accel,
+                                     max_steer_angle=max_steer_angle,
+                                     throttle_kp = throttle_kp,
+                                     throttle_ki = throttle_ki,
+                                     throttle_kd = throttle_kd)
 
         # Subscriptions
         rospy.Subscriber('/dbw_enabled', Bool, self.dbw_cb)
@@ -70,9 +68,9 @@ class DBWNode(object):
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
 
         # Initialize other variables
-        self.dbw_enabled 	= True
+        self.dbw_enabled 	    = True
         self.current_velocity 	= None
-        self.twist_cmd 		= None
+        self.twist_cmd 		    = None
 
         self.loop()
 
@@ -124,7 +122,13 @@ class DBWNode(object):
 
     def twist_cb(self, msg):
         rospy.loginfo("Received twist command %s", msg)
-	self.twist_cmd = msg
+        self.twist_cmd = msg
+
+if __name__ == '__main__':
+    DBWNode()
+
+
+
 
 
     
