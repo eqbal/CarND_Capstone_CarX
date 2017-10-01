@@ -40,8 +40,7 @@ class Controller(object):
         throttle = self.throttle_pid.step(error, dt)
         
         # Max throttle is 1.0
-        if throttle > 1.0:
-            throttle = 1.0
+        throttle = max(0.0, min(1.0, throttle))
         
         # Brake or decelerate only if the target velocity is lower than the current velocity
         # Brake value is in N/m and is calculated using car mass, acceleration and wheel rasius
@@ -58,9 +57,9 @@ class Controller(object):
         else:
             brake = 0.0
 
-        # Steering control is using Yaw Control..
-
+        # Steering control is using Yaw Control..        
         steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
+        
         self.last_time = time.time()
 	
 	return throttle, brake, steer

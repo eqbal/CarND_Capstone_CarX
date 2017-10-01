@@ -25,8 +25,6 @@ Once you have the proposed throttle, brake, and steer values, publish it on the 
 that we have created in the `__init__` function.
 '''
 
-ONE_MPH        = 0.44704
-
 class DBWNode(object):
     def __init__(self):
         rospy.init_node('dbw_node')
@@ -43,7 +41,7 @@ class DBWNode(object):
 
         # PID Control Inits
         throttle_kp         = 0.3
-        throttle_ki	        = 0.003
+        throttle_ki         = 0.003
         throttle_kd         = 4.0
 
         # Publishers
@@ -69,7 +67,7 @@ class DBWNode(object):
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(50) # 50Hz
+        rate = rospy.Rate(10) # 10Hz
         while not rospy.is_shutdown():
             # Get predicted throttle, brake, and steering using `twist_controller`
             # And publish only if the control commands dbw is enabled
