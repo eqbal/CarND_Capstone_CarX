@@ -43,8 +43,6 @@ class Controller(object):
         if throttle > 1.0:
             throttle = 1.0
         
-        print ("Throttle :", throttle)
-        
         # Brake or decelerate only if the target velocity is lower than the current velocity
         # Brake value is in N/m and is calculated using car mass, acceleration and wheel rasius
         # longitudinal force = mass of car * acceleration (or deceleration)
@@ -60,12 +58,9 @@ class Controller(object):
         else:
             brake = 0.0
 
-        print ("Brake :", brake)
-        
         # Steering control is using Yaw Control..
 
         steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
-        print ("Steering :", steer)
         self.last_time = time.time()
 	
 	return throttle, brake, steer
