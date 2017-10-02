@@ -3,9 +3,10 @@
 import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
+from std_msgs.msg import Int32
 
 import math
-
+import numpy as np
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
 
@@ -26,31 +27,76 @@ LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this n
 
 class WaypointUpdater(object):
     def __init__(self):
+        
+        self.pose = None      
+        self.waypoints = None # read waypoints
+        self.final_waypoints = None
+        self.point = None # Stores the waypoint index the car is closest to
+        self.traffic_point = -1
+        self.red_light_ahead = 0
+        self.point_dist = 1
+        
         rospy.init_node('waypoint_updater')
-
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-
+        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        # rospy.Subscriber('/obstacle_waypoint', PoseStamped, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-
-        # TODO: Add other member variables you need below
-
+        
         rospy.spin()
 
     def pose_cb(self, msg):
-        # TODO: Implement
-        pass
+        self.pose = msg
+
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
+
+        d = [] # temporary list to capture distance of waypoints from current position
+        # rospy.loginfo(self.pose)
+
+        if self.waypoints:
+            for waypoint in self.waypoints.waypoints: 
+                d.append(dl(waypoint.pose.pose.position, self.pose.pose.position))
+            self.point = np.argmin(d)
+            self.Publish()
+
+
+    def Publish(self):
+
+        # Final waypoint ground truth data
+        self.final_waypoints = self.waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
+
+
+        # Update if there is a traffic light event
+
+        self.red_light_ahead = (self.traffic_point.data != -1) & (self.point <= self.traffic_point.data)
+        if self.red_light_ahead:
+            self.point_dist = self.traffic_point.data - self.point
+            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
+                self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
+        else:
+            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
+                self.set_waypoint_velocity(self.final_waypoints, ii, 11)
+
+
+        l = Lane()
+        l.header = self.waypoints.header
+        l.waypoints = self.final_waypoints
+        self.final_waypoints_pub.publish(l)
 
     def waypoints_cb(self, waypoints):
-        # TODO: Implement
-        pass
+        '''
+        Finds the closest base waypoint position from the current car's position as an index
+        Publishes the next LOOKAHEAD_WPS points
+        '''
+        self.waypoints = waypoints
 
+        
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
-        pass
+     	self.traffic_point = msg
+
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
@@ -69,6 +115,7 @@ class WaypointUpdater(object):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
+    
 
 
 if __name__ == '__main__':
