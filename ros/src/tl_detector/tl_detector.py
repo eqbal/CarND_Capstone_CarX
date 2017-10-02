@@ -251,7 +251,7 @@ class TLDetector(object):
             if light:
                 if not USE_CLASSIFIER:
                     state = self.lights[current_light].state
-                    rospy.loginfo("Current light state: {} at waypoint {}".format(state, light_wp))
+                    # rospy.loginfo("Current light state: {} at waypoint {}".format(state, light_wp))
                 else:
                     state = self.get_light_state(light)
                 return light_wp, state

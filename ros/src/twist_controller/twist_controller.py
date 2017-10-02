@@ -43,9 +43,9 @@ class Controller(object):
         throttle = max(0.0, min(1.0, throttle))
         
         # Brake or decelerate only if the target velocity is lower than the current velocity
-        # Brake value is in N/m and is calculated using car mass, acceleration and wheel rasius
+        # Brake value is in N/m and is calculated using car mass, acceleration and wheel radius
         # longitudinal force = mass of car * acceleration (or deceleration)
-        # Torque = longitudinal force * wheel radius
+        # Torque = longitudinal force * wheel radius, which is supplied as brake value
         
         if error < 0: # Needs to decelerate
             deceleration        = (target_v.x - current_v.x) / dt
