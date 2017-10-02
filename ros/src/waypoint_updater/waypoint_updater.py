@@ -23,18 +23,16 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-
+DISTANCE_TRAFFIC_LIGHT = 50 # [in m ] when red traffic light ahead, act when closer than this distance
 
 class WaypointUpdater(object):
     def __init__(self):
-        
-        self.pose = None      
+            
         self.waypoints = None # read waypoints
         self.final_waypoints = None
         self.point = None # Stores the waypoint index the car is closest to
-        self.traffic_point = -1
+        self.traffic_point = -1 # Stores the waypoint index of the closest traffic light
         self.red_light_ahead = 0
-        self.point_dist = 1
         
         rospy.init_node('waypoint_updater')
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -49,37 +47,42 @@ class WaypointUpdater(object):
         rospy.spin()
 
     def pose_cb(self, msg):
-        self.pose = msg
+        '''
+        TODO:
 
+        The first time to fine the code searches all the waypoints
+        The later time only searches 100 pts ahead
+        '''
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
-
         d = [] # temporary list to capture distance of waypoints from current position
         # rospy.loginfo(self.pose)
 
         if self.waypoints:
             for waypoint in self.waypoints.waypoints: 
-                d.append(dl(waypoint.pose.pose.position, self.pose.pose.position))
+                d.append(dl(waypoint.pose.pose.position, msg.pose.position))
             self.point = np.argmin(d)
+            self.final_waypoints = self.waypoints.waypoints[self.point: self.point + LOOKAHEAD_WPS +1 ]
             self.Publish()
 
 
     def Publish(self):
 
-        # Final waypoint ground truth data
-        self.final_waypoints = self.waypoints.waypoints[self.point:self.point+1 + LOOKAHEAD_WPS]
-
-
-        # Update if there is a traffic light event
-
-        self.red_light_ahead = (self.traffic_point.data != -1) & (self.point <= self.traffic_point.data)
-        if self.red_light_ahead:
-            self.point_dist = self.traffic_point.data - self.point
-            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
-                self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
-        else:
-            for ii,_ in enumerate(self.final_waypoints[:self.point_dist]):
-                self.set_waypoint_velocity(self.final_waypoints, ii, 11)
-
+        # Update if there is a traffic light even
+        if (self.traffic_point is not None) & (self.point is not None):
+            self.red_light_ahead = (self.traffic_point.data != -1) & (self.point <= self.traffic_point.data)
+            
+            if self.red_light_ahead: 
+                point_dist = self.traffic_point.data - self.point
+                
+                for ii in range(point_dist):
+                    
+                    if self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT:
+                        rospy.loginfo("%d %d", ii, point_dist)
+                        self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
+            else:
+                
+                for ii in range(LOOKAHEAD_WPS):
+                    self.set_waypoint_velocity(self.final_waypoints, ii, 11.0)
 
         l = Lane()
         l.header = self.waypoints.header
