@@ -62,13 +62,10 @@ class WaypointUpdater(object):
                 point_dist = self.traffic_point - self.pos_point
                 chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < LOOKAHEAD_WPS)
                 if chk_point_distance:
-                    if self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT:
+                    if (self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT):
                         # rospy.loginfo(self.distance(self.final_waypoints, ii, point_dist + 1))
                         self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
-                    else: 
-                        self.set_waypoint_velocity(self.final_waypoints, ii, self.max_velocity)
                 
-
         self.Publish()
 
 
