@@ -10,6 +10,7 @@ class PID(object):
         self.kd  = kd
         self.min = mn
         self.max = mx
+
         self.int_val = self.last_int_val = self.last_error = 0.
 
     def reset(self):
