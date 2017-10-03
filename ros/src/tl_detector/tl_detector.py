@@ -16,6 +16,8 @@ import numpy as np
 import PyKDL
 
 STATE_COUNT_THRESHOLD = 3
+USE_CLASSIFIER = False
+
 
 class TLDetector(object):
     def __init__(self):
@@ -287,6 +289,58 @@ class TLDetector(object):
 
         return best_i, best_angle, best_distance
 
+        if not self.waypoints or not self.waypoints.waypoints:
+            rospy.logerr("Waypoints empty")
+            return None
+
+        my_waypoints = self.waypoints.waypoints
+        rospy.logdebug("waypoints: {}".format(len(my_waypoints)))
+
+        pos_x = pose.position.x
+        pos_y = pose.position.y
+
+        current_distance = sys.maxsize
+        current_waypoint = None
+
+        #Lets find where we are using the euclidean distance
+        for i in range(0, len(my_waypoints)):
+            waypoint_pos_x = my_waypoints[i].pose.pose.position.x
+            waypoint_pos_y = my_waypoints[i].pose.pose.position.y
+            pos_distance = math.sqrt(math.pow(waypoint_pos_x - pos_x, 2) +
+                                     math.pow(waypoint_pos_y - pos_y, 2))
+
+            #find closest distance
+            if pos_distance < current_distance:
+                current_waypoint = i
+                current_distance = pos_distance
+
+        return current_waypoint
+
+    def get_closest_light(self, waypoint_i):
+
+        my_waypoints = self.waypoints.waypoints
+
+        #rospy.logwarn("waypoints: {}".format(len(my_waypoints)))
+
+        pos_x = my_waypoints[waypoint_i].pose.pose.position.x
+        pos_y = my_waypoints[waypoint_i].pose.pose.position.y
+
+        current_distance = sys.maxsize
+        current_light = None
+
+        #Lets find where we are using the euclidean distance
+        for i in range(0, len(self.lights)):
+            light_pos_x = self.lights[i].pose.pose.position.x
+            light_pos_y = self.lights[i].pose.pose.position.y
+            pos_distance = math.sqrt(math.pow(light_pos_x - pos_x, 2) +
+                                     math.pow(light_pos_y - pos_y, 2))
+
+            #find closest distance
+            if pos_distance < current_distance:
+                current_light = i
+                current_distance = pos_distance
+
+        return current_light, current_distance
 
     def project_to_image_plane(self, point_in_world):
         """Project point from 3D world coordinates to 2D camera image location
