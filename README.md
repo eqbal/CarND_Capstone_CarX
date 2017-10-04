@@ -112,23 +112,37 @@ where he needs it to be
 ### Usage
 
 1. Clone the project repository
-```bash
-git clone https://github.com/udacity/CarND-Capstone.git
-```
+
+	```bash
+	git clone https://github.com/udacity/CarND-Capstone.git
+	```
 
 2. Install python dependencies
-```bash
-cd CarND-Capstone
-pip install -r requirements.txt
-```
+
+	```bash
+	cd CarND-Capstone
+	pip install -r requirements.txt
+	```
+
 3. Make and run styx
-```bash
-cd ros
-catkin_make
-source devel/setup.sh
-roslaunch launch/styx.launch
-```
+
+	```bash
+	cd ros
+	catkin_make
+	source devel/setup.sh
+	roslaunch launch/styx.launch
+	```
+
 4. Run the simulator
+
+### Running code on CARLA
+
+In order to run the code on CARLA, it is necessary to use a different classifier. At the moment we are using an SVM in the simulator environment, while a FCN is used to detect traffic lights in the real world.
+
+Therefore, it is necessary to download the trained FCN network (based on VGG) snapshot.
+
+Due to the size of the file, it cannot be hosted in GitHub, so please use the following link to download:[Trained FCN snapshot](some_url_after_checking_with_carx_team).
+
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
