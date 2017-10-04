@@ -49,9 +49,9 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 	-  __Processing of the waypoints__ (`waypoints_process`):
 	The fnctions loops throught the subsequent waypoints and the following options can take plance.
-	-- __Traffic light not close or green:__ The waypoints velocity is upated with the maximum allowed one
-	-- __Traffic light red and close__: The car is required to stop. The velocity is set to 0
-	- __Traffic light red within deceleration distance__: Car is approaching the traddice light but is not so close yet. Velocity is linearly dropping.
+		- __Traffic light not close or green:__ The waypoints velocity is upated with the maximum allowed one
+		- __Traffic light red and close__: The car is required to stop. The velocity is set to 0
+		- __Traffic light red within deceleration distance__: Car is approaching the traddice light but is not so close yet. Velocity is linearly dropping.
 
 	After the waypoints are updated they are published and are send through the waypoint follower to the `twist controller` which is implementing the actuator commands.
 	This node publishes to following topics:
