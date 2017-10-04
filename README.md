@@ -1,4 +1,20 @@
-This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+## Self-Driving Car Nanodegree Capstone Project
+
+<center>**CAR-X** Team</center>
+
+### Overview
+
+The System Integration project is the final project of the Udacity Self-Driving Car Engineer Nanodegree.
+
+The goal of this project is to code a real self-driving car to drive itself on a test track using [ROS](http://www.ros.org/) and [Autoware](https://github.com/CPFL/Autoware). The project is coded to run on Udacity simulator as well as on Udacity's own self-driving car [CARLA](https://medium.com/udacity/how-the-udacity-self-driving-car-works-575365270a40).
+
+![CARLA](./imgs/udacity-carla.jpg)
+
+As a team, we built ROS nodes to implement core functionality of the autonomous vehicle system, including traffic light detection, control, and waypoint following.
+
+For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+
+### Architecture
 
 ### Installation
 
@@ -54,12 +70,13 @@ Assuming `Eqbal` is handling the `dbw_node`:
 
 - Please don't apply the changes directly to `master`
 
-### Project management tool
+### Task break down table
 To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below:
 
 https://github.com/eqbal/CarND_Capstone_CarX/projects/1
 
-### Team
+### Team Members:
+
   - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com)
 
 	> Eki has already written a book about Ruby 5.0. It’s currently
