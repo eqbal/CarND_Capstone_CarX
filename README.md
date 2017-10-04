@@ -16,6 +16,17 @@ For more information about the project, see the project introduction [here](http
 
 ### Architecture
 
+Using the Robot Operating System (ROS), each team member has developed and maintained a core component of the infrastructure that is demanded by the autonomous vehicle. The three core components of any good robot are the following:
+
+- Perception: Sensing the environment to perceive obstacles, traffic hazards as well as traffic lights and road signs.
+
+- Planning: Route planning to a given goal state using data from localization, perception and environment maps.
+
+- Control: Actualising trajectories formed as part of planning, in order actuate the vehicle, through steering, throttle and brake commands.
+
+![ROS Architecture](./imgs/ros-architecture.png)
+
+
 ### Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
