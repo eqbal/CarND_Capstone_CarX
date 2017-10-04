@@ -1,6 +1,4 @@
-## Self-Driving Car Nanodegree Capstone Project
-
-<center>**CAR-X** Team</center>
+# Self-Driving Car Nanodegree Capstone Project (CAR-X Team)
 
 ### Overview
 
@@ -41,10 +39,23 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 	- **current_pose**: To receive current position of vehicle.
 
-	The waypoint updater node finds the closest waypoint to the vehicle’s current position and converts it to the vehicle’s coordinate system to find out of this waypoint is ahead (x >= 0) of the vehicle. Then it sets the velocity of the next 200 waypoints and publishes them as `final_waypoints`. If the car approaches a red traffic light, it lowers the velocity of these 100 waypoints to stop the vehicle at the stop line.
-	
+
+	The functionality of the `waypoint updater` node is to process the track waypoints that are provided from the `waypoint_loader` and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
+
+	For the described operation the following steps are followed, provided that the track waypoints have already been loaded:
+
+	- __Identify the car's position in the car__ (`pose_cb`) :
+	Knowing the car's position in (x,y) coordinates, the closent track point is returned as an index ranked by its Euclideian distance.  Then the next few points ahead (defined by LOOKAHEAD_WPS constant) will be the final uprocessed waypoints.
+
+	-  __Processing of the waypoints__ (`waypoints_process`):
+	The fnctions loops throught the subsequent waypoints and the following options can take plance.
+	-- __Traffic light not close or green:__ The waypoints velocity is upated with the maximum allowed one
+	-- __Traffic light red and close__: The car is required to stop. The velocity is set to 0
+	- __Traffic light red within deceleration distance__: Car is approaching the traddice light but is not so close yet. Velocity is linearly dropping.
+
+	After the waypoints are updated they are published and are send through the waypoint follower to the `twist controller` which is implementing the actuator commands.
 	This node publishes to following topics:
-	
+
 	- **final_waypoints**: Selected 200 waypoints including their velocity information are published to this topic.
 
 
@@ -53,19 +64,19 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	This node is responsible for vehicle control (acceleration, steering, brake).
 
 	This node subscribes to the following topics:
-	
+
 	- **dbw_enabled**: Indicates if the car is under dbw or driver control.
 	- **current_velocity**: To receive the current velocity of the vehicle.
 	- **twist_cmd**: Target vehicle linear and angular velocities in the form of twist commands are published to this topic.
 
 	This node publishes to following topics:
-	
+
 	- **steering_cmd**: Steering commands are published to this topic.
 	- **throttle_cmd**: Throttle commands are published to this topic.
 	- **brake_cmd**: Brake commands are published to this topic.
 
 	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller which in turn uses the following four PID controllers and a low pass filter:
-	
+
 	- PID Controller for velocity to drive the vehicle with target velocity:
 
 		```
@@ -80,15 +91,15 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	    kp   = ?
 	    ki   = ?
 	    kd   = ?
-		```		
+		```
 	- PID Controller for steering angle to reduce the error of target steering angle calculated using Yaw Controller. It uses the following parameters:
 
 		```
 	    kp   = ?
 	    ki   = ?
 	    kd   = ?
-		```		
-		
+		```
+
 	- Yaw Controller to calculate the steering angle based on the current linear velocity and the target linear and angular velocity. The result of this controller is added to the error value received from PID Controller for steering angle.
 
 	- Low pass filter for acceleration is used in conjunction with PID controller for acceleration to calculate acceleration commands.
@@ -191,7 +202,7 @@ where he needs it to be
   - Dimitrios Mavridis (dmavridis@gmail.com)
 
 	> Dimitrios's code doesn't follow a coding convention. It is the coding convention.
-	
+
   - Mani Srinivasan (srnimani@gmail.com)
 	> Mani does not use revision control software. None of his code has ever needed revision.
 
