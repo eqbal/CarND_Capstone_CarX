@@ -26,6 +26,36 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 ![ROS Architecture](./imgs/ros-architecture.png)
 
+### ROS Nodes Description
+
+
+- Waypoint Updater node (**waypoint_updater**)
+
+	This node publishes the next **200** waypoints that are closest to vehicle's current location and are ahead of the vehicle. This node also considers obstacles and traffic lights to set the velocity for each waypoint.
+
+	This node subscribes to following topics:
+
+	- **base_waypoints**: Waypoints for the whole track are published to this topic. This publication is a one-time only operation. The waypoint updater node receives these waypoints, stores them for later use and uses these points to extract the next 200 points ahead of the vehicle.
+
+	- **traffic_waypoint**: To receive the index of the waypoint in the base_waypoints list, which is closest to the red traffic light so that the vehicle can be stopped. The waypoint updater node uses this index to calculate the distance from the vehicle to the traffic light if the traffic light is red and the car needs to be stopped.
+
+	- **current_pose**: To receive current position of vehicle.
+
+	The waypoint updater node finds the closest waypoint to the vehicle’s current position and converts it to the vehicle’s coordinate system to find out of this waypoint is ahead (x >= 0) of the vehicle. Then it sets the velocity of the next 200 waypoints and publishes them as `final_waypoints`. If the car approaches a red traffic light, it lowers the velocity of these 100 waypoints to stop the vehicle at the stop line.
+	
+	This node publishes to following topics:
+	
+	- **final_waypoints**: Selected 200 waypoints including their velocity information are published to this topic.
+
+
+- DBW Node **(dbw_node)**
+
+	Once your waypoint updater is publishing `/final_waypoints`, the waypoint_follower node will start publishing messages to `the/twist_cmd` topic. At this point, you have everything needed to build the `dbw_node`. After completing this step, the car should drive in the simulator, ignoring the traffic lights.
+
+- **Traffic Light Detection and Classifier**:
+  - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
+  - Classifier:
+
 
 ### Installation
 
@@ -44,18 +74,39 @@ Using the Robot Operating System (ROS), each team member has developed and maint
   * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
 * Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases/tag/v1.2).
 
-### Sections
+### Usage
 
-- **Waypoint Updater and Publisher** Node:
-  - subscribes to `/base_waypoints` and `/current_pose` and publishes to `/final_waypoints`.
-  - Once you have correctly identified the traffic light and determined its position, you can convert it to a waypoint index and publish it.
-  - Use `/traffic_waypoint` to change the waypoint target velocities before publishing to `/final_waypoints`.
+1. Clone the project repository
 
-- **DBW** Node: Once your waypoint updater is publishing `/final_waypoints`, the waypoint_follower node will start publishing messages to `the/twist_cmd` topic. At this point, you have everything needed to build the `dbw_node`. After completing this step, the car should drive in the simulator, ignoring the traffic lights.
+	```bash
+	git clone https://github.com/udacity/CarND-Capstone.git
+	```
 
-- **Traffic Light Detection and Classifier**:
-  - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
-  - Classifier:
+2. Install python dependencies
+
+	```bash
+	cd CarND-Capstone
+	pip install -r requirements.txt
+	```
+
+3. Make and run styx
+
+	```bash
+	cd ros
+	catkin_make
+	source devel/setup.sh
+	roslaunch launch/styx.launch
+	```
+
+4. Run the simulator
+
+### Running code on CARLA
+
+In order to run the code on CARLA, it is necessary to use a different classifier. At the moment we are using an SVM in the simulator environment, while a FCN is used to detect traffic lights in the real world.
+
+Therefore, it is necessary to download the trained FCN network (based on VGG) snapshot.
+
+Due to the size of the file, it cannot be hosted in GitHub, so please use the following link to download: [Trained FCN snapshot](some_url_after_checking_with_carx_team).
 
 
 ### Roadmap
@@ -108,43 +159,8 @@ where he needs it to be
   - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com)
 	> Volodymyr's coding reputation is only as modest as it is because of integer overflow (SQL Server does not have a datatype large enough)
 
-
-### Usage
-
-1. Clone the project repository
-
-	```bash
-	git clone https://github.com/udacity/CarND-Capstone.git
-	```
-
-2. Install python dependencies
-
-	```bash
-	cd CarND-Capstone
-	pip install -r requirements.txt
-	```
-
-3. Make and run styx
-
-	```bash
-	cd ros
-	catkin_make
-	source devel/setup.sh
-	roslaunch launch/styx.launch
-	```
-
-4. Run the simulator
-
-### Running code on CARLA
-
-In order to run the code on CARLA, it is necessary to use a different classifier. At the moment we are using an SVM in the simulator environment, while a FCN is used to detect traffic lights in the real world.
-
-Therefore, it is necessary to download the trained FCN network (based on VGG) snapshot.
-
-Due to the size of the file, it cannot be hosted in GitHub, so please use the following link to download:[Trained FCN snapshot](some_url_after_checking_with_carx_team).
-
-
 ### Real world testing
+
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
 2. Unzip the file
 ```bash

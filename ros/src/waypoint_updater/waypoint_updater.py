@@ -37,7 +37,7 @@ class WaypointUpdater(object):
         self.pos_point = None # Stores the waypoint index the car is closest to
         self.traffic_point = -1 # Stores the waypoint index of the closest traffic light
         self.red_light_ahead = False
-        
+
         # Subscribers
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -46,7 +46,7 @@ class WaypointUpdater(object):
 
         # Publisher
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-        
+
         rospy.spin()
 
 
@@ -65,7 +65,7 @@ class WaypointUpdater(object):
                     if (self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT):
                         # rospy.loginfo(self.distance(self.final_waypoints, ii, point_dist + 1))
                         self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
-                
+
         self.Publish()
 
 
@@ -94,7 +94,7 @@ class WaypointUpdater(object):
         # rospy.loginfo(self.pose)
 
         if self.waypoints:
-            for waypoint in self.waypoints.waypoints: 
+            for waypoint in self.waypoints.waypoints:
                 d.append(dl(waypoint.pose.pose.position, msg.pose.position))
             self.pos_point = np.argmin(d)
             self.final_waypoints = self.waypoints.waypoints[self.pos_point: self.pos_point + LOOKAHEAD_WPS +1]
@@ -109,7 +109,7 @@ class WaypointUpdater(object):
             if self.traffic_point > self.pos_point:
                 self.red_light_ahead = True
             else:
-                self.red_light_ahead = False            
+                self.red_light_ahead = False
         else:
             self.traffic_point = None
             self.red_light_ahead = False
