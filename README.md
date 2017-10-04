@@ -48,10 +48,54 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- **final_waypoints**: Selected 200 waypoints including their velocity information are published to this topic.
 
 
-- DBW Node **(dbw_node)**
+- Twist Controller Node **(dbw_node)**
 
-	Once your waypoint updater is publishing `/final_waypoints`, the waypoint_follower node will start publishing messages to `the/twist_cmd` topic. At this point, you have everything needed to build the `dbw_node`. After completing this step, the car should drive in the simulator, ignoring the traffic lights.
+	This node is responsible for vehicle control (acceleration, steering, brake).
 
+	This node subscribes to the following topics:
+	
+	- **dbw_enabled**: Indicates if the car is under dbw or driver control.
+	- **current_velocity**: To receive the current velocity of the vehicle.
+	- **twist_cmd**: Target vehicle linear and angular velocities in the form of twist commands are published to this topic.
+
+	This node publishes to following topics:
+	
+	- **steering_cmd**: Steering commands are published to this topic.
+	- **throttle_cmd**: Throttle commands are published to this topic.
+	- **brake_cmd**: Brake commands are published to this topic.
+
+	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller which in turn uses the following four PID controllers and a low pass filter:
+	
+	- PID Controller for velocity to drive the vehicle with target velocity:
+
+		```
+	    kp   = ?
+	    ki   = ?
+	    kd   = ?
+		```
+
+	- PID Controller for acceleration to accelerate the vehicle smoothly. It uses this PID controller with the following parameters:
+
+		```
+	    kp   = ?
+	    ki   = ?
+	    kd   = ?
+		```		
+	- PID Controller for steering angle to reduce the error of target steering angle calculated using Yaw Controller. It uses the following parameters:
+
+		```
+	    kp   = ?
+	    ki   = ?
+	    kd   = ?
+		```		
+		
+	- Yaw Controller to calculate the steering angle based on the current linear velocity and the target linear and angular velocity. The result of this controller is added to the error value received from PID Controller for steering angle.
+
+	- Low pass filter for acceleration is used in conjunction with PID controller for acceleration to calculate acceleration commands.
+
+
+
+		
 - **Traffic Light Detection and Classifier**:
   - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
   - Classifier:
