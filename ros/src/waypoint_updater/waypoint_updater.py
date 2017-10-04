@@ -24,13 +24,15 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-DISTANCE_TRAFFIC_LIGHT = 50 # [in m ] when red traffic light ahead, act when closer than this distance
+LIMIT_TRAFFIC_LIGHT = 100 # [in m ] when red traffic light ahead, act when closer than this distance
+LIMIT_DECELERATE = 200 # distance to start decelerating
+MAX_VELOCITY = 10
+MAX_DECEL = 1 # max deceleration 1m/s^2. this is just an indicative value from the loader node
 
 class WaypointUpdater(object):
     def __init__(self):
-        rospy.init_node('waypoint_updater')
+        rospy.init_node('waypoint_updater', log_level=rospy.DEBUG)
 
-        self.max_velocity = 10 #rospy.get_param('~max_velocity', 20)
 
         self.waypoints = None # read waypoints
         self.final_waypoints = None
@@ -56,15 +58,22 @@ class WaypointUpdater(object):
 
         for ii in range(LOOKAHEAD_WPS):
             # initialize to max velocity unless there is traffic light ahead
-            self.set_waypoint_velocity(self.final_waypoints, ii, self.max_velocity)
+            velocity = MAX_VELOCITY
 
             if self.red_light_ahead:
                 point_dist = self.traffic_point - self.pos_point
+               
+
                 chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < LOOKAHEAD_WPS)
                 if chk_point_distance:
-                    if (self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT):
-                        # rospy.loginfo(self.distance(self.final_waypoints, ii, point_dist + 1))
-                        self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
+                    distance_traffic_light = self.distance(self.final_waypoints, ii, point_dist + 1)
+                    if ii == 0:
+                        rospy.logwarn("Distance is {} m".format(distance_traffic_light))
+                    if distance_traffic_light < LIMIT_TRAFFIC_LIGHT:
+                        velocity = 0.0
+                    elif distance_traffic_light < LIMIT_DECELERATE:
+                        velocity = max(MAX_VELOCITY - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
+            self.set_waypoint_velocity(self.final_waypoints, ii, velocity)
                 
         self.Publish()
 
