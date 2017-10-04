@@ -94,11 +94,13 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- Low pass filter for acceleration is used in conjunction with PID controller for acceleration to calculate acceleration commands.
 
 
+- Traffic light detection node **(tl_detector)** ... to be continued
 
-		
-- **Traffic Light Detection and Classifier**:
-  - Detection: Detect the traffic light and its color from the `/image_color`. The topic `/vehicle/traffic_lights` contains the exact location and status of all traffic lights in simulator, so you can test your output.
-  - Classifier:
+- SVM Training Node for Traffic Light Detection and Classification **(tl_ detecor_train)** ... to be continued
+	- For Simulator (SVM)... to be continued
+	- For Real World (FCN) ... to be continued with much details of the network implementation
+
+- TLClassifier class **(tl_classifier)** ... to be continued
 
 
 ### Installation
@@ -153,28 +155,21 @@ Therefore, it is necessary to download the trained FCN network (based on VGG) sn
 Due to the size of the file, it cannot be hosted in GitHub, so please use the following link to download: [Trained FCN snapshot](some_url_after_checking_with_carx_team).
 
 
-### Roadmap
+### Collaboration
 
-  - Build the nodes described
-  - Testing with the provided simulator
-  - Upload a video sample
-  - Update the README file to include the details
-
-### Contribution
-
-Each of the four team members in `Car-X` team should handle a sections.
+Each of the team members in `Car-X` team should handle a core component.
 
 Assuming `Eqbal` is handling the `dbw_node`:
 
-- Create a branch with the first two name initiative followed by the section name: `git checkout -b eq-dbw_node`
+- Create a branch with the first two name initiative followed by the node name: `git checkout -b eq-dbw_node`
 
-- Commit the changes (better to have many comments with description description rather than one long commit)
+- Commit the changes: `git commit -am "descriptive but short commit"`
 
-- Once you are stuck push your branch so everyone in the team can check out the updates ( *don't push the code all together once you are done but rather than incrementally keep pushing changes* ): `git push -u origin eq-dbw_node`
+- Once you are stuck push your branch so everyone in the team can check out the updates: `git push -u origin eq-dbw_node`
 
 - For testing please keep your python notebooks inside `./notebooks` folder.
 
-- Please don't apply the changes directly to `master`
+- Don't apply the changes directly to `master`
 
 ### Task break down table
 To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below:
