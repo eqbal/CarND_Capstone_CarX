@@ -55,9 +55,9 @@ class DBWNode(object):
         self.controller = Controller(vehicle_mass, wheel_radius, decel_limit, wheel_base, steer_ratio, max_lat_accel, max_steer_angle, throttle_kp, throttle_ki, throttle_kd)
 
         # Subscriptions
-        rospy.Subscriber('/dbw_enabled', Bool, self.dbw_cb)
-        rospy.Subscriber('/current_velocity', TwistStamped, self.vel_cb)
-        rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
+        rospy.Subscriber('/dbw_enabled', Bool, self.dbw_cb, queue_size=1)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.vel_cb, queue_size=1)
+        rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb, queue_size=1)
 
         # Initialize other variables
         self.dbw_enabled        = True
