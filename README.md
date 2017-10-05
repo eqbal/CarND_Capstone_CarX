@@ -79,23 +79,25 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	
 	The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
 
-		```
-	    kp   = 0.3
-	    ki   = 0.003
-	    kd   = 4.0
-        
-		```
+	```
+	 kp   = 0.3
+	 ki   = 0.003
+	 kd   = 4.0
+	```
 	The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
 
-- The 'Yaw Controller' controls the steering angle based on the current linear velocity and the target linear and angular velocity.
+- The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
 - The brake value is based on multiple parametrs, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
 
-    longitudinal_force = mass_of_car * acceleration (or deceleration)
-    Torque needed to stop/ accelerate = longitudinal_force * wheel_radius
-    
-    The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
-    
+	```
+	longitudinal_force = mass_of_car * acceleration (or deceleration)
+	    
+	Torque needed to stop/ accelerate = longitudinal_force * wheel_radius
+	    
+	```
+ 
+	The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
     
 - Traffic light detection node **(tl_detector)** ... to be continued
 
