@@ -39,10 +39,6 @@ class DBWNode(object):
         max_lat_accel       = rospy.get_param('~max_lat_accel', 3.)
         max_steer_angle     = rospy.get_param('~max_steer_angle', 8.)
 
-        # PID Control Inits
-        throttle_kp         = 0.3
-        throttle_ki         = 0.003
-        throttle_kd         = 4.0
 
         # Publishers
         self.steer_pub      = rospy.Publisher('/vehicle/steering_cmd', SteeringCmd, queue_size=1)
@@ -52,7 +48,7 @@ class DBWNode(object):
         # Pass all params to `Controller` constructor, parames needed for PID Controller (kp, ki, kd) and
         # Yaw Controller (wheel_base, steer_ratio, min_speed, max_lat_accel, max_steer_angle)
 
-        self.controller = Controller(vehicle_mass, wheel_radius, decel_limit, wheel_base, steer_ratio, max_lat_accel, max_steer_angle, throttle_kp, throttle_ki, throttle_kd)
+        self.controller = Controller(vehicle_mass, fuel_capacity, wheel_radius, accel_limit, decel_limit, wheel_base, steer_ratio, max_lat_accel, max_steer_angle)
 
         # Subscriptions
         rospy.Subscriber('/dbw_enabled', Bool, self.dbw_cb, queue_size=1)
@@ -74,15 +70,15 @@ class DBWNode(object):
 
             if self.twist_cmd is None or self.current_velocity is None:
                 continue
-            
+
             throttle, brake, steering = self.controller.control(
-                                                                self.twist_cmd.twist.linear,
-                                                                self.twist_cmd.twist.angular,
-                                                                self.current_velocity.twist.linear,
-                                                                self.dbw_enabled)
+                    self.twist_cmd.twist.linear,
+                    self.twist_cmd.twist.angular,
+                    self.current_velocity.twist.linear,
+                    self.dbw_enabled)
             if self.dbw_enabled:
                 self.publish(throttle, brake, steering)
-            
+
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
@@ -91,7 +87,7 @@ class DBWNode(object):
         tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
         tcmd.pedal_cmd = throttle
         self.throttle_pub.publish(tcmd)
-        
+
         bcmd = BrakeCmd()
         bcmd.enable = True
         bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
@@ -116,8 +112,3 @@ class DBWNode(object):
 if __name__ == '__main__':
     DBWNode()
 
-
-
-
-
-    
