@@ -75,7 +75,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- **throttle_cmd**: Throttle commands are published to this topic.
 	- **brake_cmd**: Brake commands are published to this topic.
 
-	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (twist_controller_py).
+	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (as coded in twist_controller.py).
 	
 	The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
 
@@ -87,12 +87,12 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 		```
 	The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
 
-	- Yaw Controller controls the steering angle based on the current linear velocity and the target linear and angular velocity.
+- The 'Yaw Controller' controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
-- The brake control is based on multiple parametrs, viz. the mass of the vehicle, current velocity of the car, radius of the wheel and the deceleration is limited by the limit specified by the 'decel_limit' parameter.  Brake or decelerate only if the target velocity is lower than the current velocity. The brake value is in N/m and is caluclated by using the car mass, acceleartion and wheel radius.  The formulae used for calculting the brake that needs to be applied is as follows.
+- The brake value is based on multiple parametrs, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
 
     longitudinal_force = mass_of_car * acceleration (or deceleration)
-    Torque needed to stop/ accelerate = lingitudinal_force * wheel_radius
+    Torque needed to stop/ accelerate = longitudinal_force * wheel_radius
     
     The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
     
