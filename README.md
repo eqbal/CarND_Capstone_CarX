@@ -75,36 +75,28 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- **throttle_cmd**: Throttle commands are published to this topic.
 	- **brake_cmd**: Brake commands are published to this topic.
 
-	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller which in turn uses the following four PID controllers and a low pass filter:
-
-	- PID Controller for velocity to drive the vehicle with target velocity:
-
-		```
-	    kp   = ?
-	    ki   = ?
-	    kd   = ?
-		```
-
-	- PID Controller for acceleration to accelerate the vehicle smoothly. It uses this PID controller with the following parameters:
+	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (twist_controller_py).
+	
+	The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
 
 		```
-	    kp   = ?
-	    ki   = ?
-	    kd   = ?
+	    kp   = 0.3
+	    ki   = 0.003
+	    kd   = 4.0
+        
 		```
-	- PID Controller for steering angle to reduce the error of target steering angle calculated using Yaw Controller. It uses the following parameters:
+	The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
 
-		```
-	    kp   = ?
-	    ki   = ?
-	    kd   = ?
-		```
+	- Yaw Controller controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
-	- Yaw Controller to calculate the steering angle based on the current linear velocity and the target linear and angular velocity. The result of this controller is added to the error value received from PID Controller for steering angle.
+- The brake control is based on multiple parametrs, viz. the mass of the vehicle, current velocity of the car, radius of the wheel and the deceleration is limited by the limit specified by the 'decel_limit' parameter.  Brake or decelerate only if the target velocity is lower than the current velocity. The brake value is in N/m and is caluclated by using the car mass, acceleartion and wheel radius.  The formulae used for calculting the brake that needs to be applied is as follows.
 
-	- Low pass filter for acceleration is used in conjunction with PID controller for acceleration to calculate acceleration commands.
-
-
+    longitudinal_force = mass_of_car * acceleration (or deceleration)
+    Torque needed to stop/ accelerate = lingitudinal_force * wheel_radius
+    
+    The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
+    
+    
 - Traffic light detection node **(tl_detector)** ... to be continued
 
 - SVM Training Node for Traffic Light Detection and Classification **(tl_ detecor_train)** ... to be continued
