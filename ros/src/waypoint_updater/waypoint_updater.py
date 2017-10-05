@@ -24,19 +24,22 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-DISTANCE_TRAFFIC_LIGHT = 50 # [in m ] when red traffic light ahead, act when closer than this distance
+LIMIT_TRAFFIC_LIGHT = 50 # [in m ] when red traffic light ahead, act when closer than this distance
+LIMIT_DECELERATE = 100 # distance to start decelerating
+MAX_DECEL = 5 # max deceleration in m/s^2. this is just an indicative value from the loader node
 
 class WaypointUpdater(object):
     def __init__(self):
-        rospy.init_node('waypoint_updater')
+        rospy.init_node('waypoint_updater', log_level=rospy.DEBUG)
 
-        self.max_velocity = 10 #rospy.get_param('~max_velocity', 20)
 
         self.waypoints = None # read waypoints
         self.final_waypoints = None
         self.pos_point = None # Stores the waypoint index the car is closest to
         self.traffic_point = -1 # Stores the waypoint index of the closest traffic light
         self.red_light_ahead = False
+        self.lookahead_wps = 0
+        self.max_velocity = 1 
         
         # Subscribers
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -52,19 +55,22 @@ class WaypointUpdater(object):
 
     def waypoints_process(self):
 
-        # 2 options
-
-        for ii in range(LOOKAHEAD_WPS):
+        for ii in range(self.lookahead_wps):
             # initialize to max velocity unless there is traffic light ahead
-            self.set_waypoint_velocity(self.final_waypoints, ii, self.max_velocity)
-
+            velocity = self.max_velocity
             if self.red_light_ahead:
                 point_dist = self.traffic_point - self.pos_point
-                chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < LOOKAHEAD_WPS)
+                chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < self.lookahead_wps)
                 if chk_point_distance:
-                    if (self.distance(self.final_waypoints, ii, point_dist + 1) < DISTANCE_TRAFFIC_LIGHT):
-                        # rospy.loginfo(self.distance(self.final_waypoints, ii, point_dist + 1))
-                        self.set_waypoint_velocity(self.final_waypoints, ii, 0.0)
+                    distance_traffic_light = self.distance(self.final_waypoints, ii, point_dist + 1)
+                    if distance_traffic_light < LIMIT_TRAFFIC_LIGHT:
+                        velocity = 0.0
+                    elif distance_traffic_light < LIMIT_DECELERATE:
+                        velocity = max(self.max_velocity - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
+
+
+
+            self.set_waypoint_velocity(self.final_waypoints, ii, velocity)
                 
         self.Publish()
 
@@ -81,23 +87,33 @@ class WaypointUpdater(object):
         Publishes the next LOOKAHEAD_WPS points
         '''
         self.waypoints = waypoints
+        self.waypoints_size = np.shape(waypoints.waypoints)[0]
+        self.lookahead_wps = min(LOOKAHEAD_WPS, self.waypoints_size//2)
+        rospy.logwarn("Total waypoints {}".format(self.waypoints_size))
+        self.max_velocity = self.get_waypoint_velocity(waypoints.waypoints[0])/3.6
+        rospy.logwarn("Max Velocity {}".format(self.max_velocity))
+
 
     def pose_cb(self, msg):
         '''
-        TODO:
-
-        The first time to fine the code searches all the waypoints
-        The later time only searches 100 pts ahead
+		Return closest waypoint
         '''
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
         d = [] # temporary list to capture distance of waypoints from current position
-        # rospy.loginfo(self.pose)
-
         if self.waypoints:
             for waypoint in self.waypoints.waypoints: 
                 d.append(dl(waypoint.pose.pose.position, msg.pose.position))
             self.pos_point = np.argmin(d)
-            self.final_waypoints = self.waypoints.waypoints[self.pos_point: self.pos_point + LOOKAHEAD_WPS +1]
+
+
+
+            # Check to implement circular list
+            if self.pos_point + self.lookahead_wps +1 > self.waypoints_size:
+                list_end = self.pos_point + self.lookahead_wps +1 - self.waypoints_size
+                self.final_waypoints = self.waypoints.waypoints[self.pos_point:] + self.waypoints.waypoints[:list_end]
+            else:
+                self.final_waypoints = self.waypoints.waypoints[self.pos_point: self.pos_point + self.lookahead_wps +1]
+
             self.waypoints_process()
 
     def traffic_cb(self, msg):
