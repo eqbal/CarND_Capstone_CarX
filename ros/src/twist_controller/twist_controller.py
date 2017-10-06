@@ -74,7 +74,7 @@ class Controller(object):
 
         # Steering control is using Yaw Control and look for bounds..
         
-        steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x) - self.steer_pid(s_error, dt)
+        steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x) - self.steer_pid.step(s_error, dt)
         steer = max(-abs(self.max_steer_angle), min(abs(self.max_steer_angle), steer))
 
         self.last_time = time.time()
