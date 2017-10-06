@@ -54,9 +54,9 @@ class TLDetector(object):
         # Visualization publishers
         self.image_viz = rospy.Publisher('/image_proccessed', Image, queue_size=1)
         self.active_tl_viz = rospy.Publisher('/wpts', PoseStamped, queue_size=1)
-        self.tl_viz = rospy.Publisher('tl_viz', MarkerArray)
-        self.tl_front_viz = rospy.Publisher('tl_front_viz', Marker)
-        self.wp_viz = rospy.Publisher('wp_viz', MarkerArray)
+        self.tl_viz = rospy.Publisher('tl_viz', MarkerArray, queue_size=1)
+        self.tl_front_viz = rospy.Publisher('tl_front_viz', Marker, queue_size=1)
+        self.wp_viz = rospy.Publisher('wp_viz', MarkerArray, queue_size=1)
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
