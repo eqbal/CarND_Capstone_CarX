@@ -24,10 +24,10 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-LIMIT_TRAFFIC_LIGHT = 100 # [in m ] when red traffic light ahead, act when closer than this distance
-LIMIT_DECELERATE = 200 # distance to start decelerating
-MAX_VELOCITY = 10/3.6
-MAX_DECEL = 1 # max deceleration 1m/s^2. this is just an indicative value from the loader node
+DISTANCE_TRAFFIC_LIGHT = 20 # Position to stop in front of traffic light
+LIMIT_TRAFFIC_LIGHT = 50 # [in m ] when red traffic light ahead, act when closer than this distance
+LIMIT_DECELERATE = 100 # distance to start decelerating
+MAX_DECEL = 5 # max deceleration in m/s^2. this is just an indicative value from the loader node
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -57,18 +57,16 @@ class WaypointUpdater(object):
 
         for ii in range(self.lookahead_wps):
             # initialize to max velocity unless there is traffic light ahead
-            velocity = MAX_VELOCITY
+            velocity = self.max_velocity
             if self.red_light_ahead:
                 point_dist = self.traffic_point - self.pos_point
                 chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < self.lookahead_wps)
                 if chk_point_distance:
                     distance_traffic_light = self.distance(self.final_waypoints, ii, point_dist + 1)
-                    # if ii == 0:
-                    #     rospy.logwarn("Distance is {} m".format(distance_traffic_light))
                     if distance_traffic_light < LIMIT_TRAFFIC_LIGHT:
                         velocity = 0.0
                     elif distance_traffic_light < LIMIT_DECELERATE:
-                        velocity = max(MAX_VELOCITY - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
+                        velocity = max(self.max_velocity - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
 
 
 
@@ -92,13 +90,13 @@ class WaypointUpdater(object):
         self.waypoints_size = np.shape(waypoints.waypoints)[0]
         self.lookahead_wps = min(LOOKAHEAD_WPS, self.waypoints_size//2)
         rospy.logwarn("Total waypoints {}".format(self.waypoints_size))
+        self.max_velocity = self.get_waypoint_velocity(waypoints.waypoints[0])/3.6
+        rospy.logwarn("Max Velocity {}".format(self.max_velocity))
+
 
     def pose_cb(self, msg):
         '''
-        TODO:
-
-        The first time to fine the code searches all the waypoints
-        The later time only searches 100 pts ahead
+		Return closest waypoint
         '''
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
         d = [] # temporary list to capture distance of waypoints from current position
