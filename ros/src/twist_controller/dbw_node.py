@@ -75,6 +75,7 @@ class DBWNode(object):
                     self.twist_cmd.twist.linear,
                     self.twist_cmd.twist.angular,
                     self.current_velocity.twist.linear,
+                    self.current_velocity.twist.angular,
                     self.dbw_enabled)
             if self.dbw_enabled:
                 self.publish(throttle, brake, steering)
