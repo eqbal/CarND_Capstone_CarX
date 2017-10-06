@@ -107,6 +107,11 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 - TLClassifier class **(tl_classifier)** ... to be continued
 
+### Visualization module
+
+To facilitate debugging of the system a visualization module was created for RVIZ. Information about waypoints, car location, upcoming stop light and also traffic light and their status - red, yellow or green. The screenshot below is an example of RVIZ debugging session:
+
+![visualization](./imgs/visualization_module.png)
 
 ### Installation
 
