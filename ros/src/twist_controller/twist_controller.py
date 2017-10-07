@@ -49,13 +49,13 @@ class Controller(object):
         
         if error < 0: # Needs to decelerate
             deceleration        = (target_v.x - current_v.x) / dt
+	    if abs(deceleration) > abs(self.d_limit):
+                deceleration = self.d_limit  # Limited to decelartion limits
             longitudinal_force  = self.v_mass * deceleration
             brake               = longitudinal_force * self.w_radius
-            if brake < self.d_limit:
-                brake = - 5   # Limited to decelartion limits
-            throttle = 0.0
+            throttle 		= 0.0
         else:
-            brake = 0.0
+            brake 		= 0.0
 
         # Steering control is using Yaw Control..        
         steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
