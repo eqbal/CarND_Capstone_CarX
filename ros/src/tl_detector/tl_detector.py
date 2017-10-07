@@ -54,9 +54,9 @@ class TLDetector(object):
         # Visualization publishers
         self.image_viz = rospy.Publisher('/image_proccessed', Image, queue_size=1)
         self.active_tl_viz = rospy.Publisher('/wpts', PoseStamped, queue_size=1)
-        self.tl_viz = rospy.Publisher('tl_viz', MarkerArray)
-        self.tl_front_viz = rospy.Publisher('tl_front_viz', Marker)
-        self.wp_viz = rospy.Publisher('wp_viz', MarkerArray)
+        self.tl_viz = rospy.Publisher('tl_viz', MarkerArray, queue_size=1)
+        self.tl_front_viz = rospy.Publisher('tl_front_viz', Marker, queue_size=1)
+        self.wp_viz = rospy.Publisher('wp_viz', MarkerArray, queue_size=1)
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
@@ -478,7 +478,14 @@ class TLDetector(object):
         # import ipdb; ipdb.set_trace()
         stop_i, _, _ = self.get_closest_waypoint(self.lights[tl_i].pose.pose,
                                                     stop_line_positions)
-                                                    # stop_line_positions, 'F', search_radius = 100.)
+        stop_i_car, _, _ = self.get_closest_waypoint(self.pose.pose,
+                                                     stop_line_positions, 'F')
+
+        if stop_i_car != stop_i:
+            self.visualize_tl_front(None)
+            self.visualize_tl_front(None, 0)
+            return -1, TrafficLight.UNKNOWN
+
         stop_wp_i, _, _ = self.get_closest_waypoint(stop_line_positions[stop_i].pose.pose,
                                                     self.waypoints.waypoints)
         state = self.get_light_state(self.lights[tl_i])
