@@ -1,4 +1,3 @@
-
 import time
 from pid import PID
 from yaw_controller import YawController
@@ -6,7 +5,7 @@ from lowpass import LowPassFilter
 
 
 GAS_DENSITY = 2.858
-ONE_MPH	    = 0.44704
+ONE_MPH     = 0.44704
 MAX_SPEED   = 40.0
 
 
@@ -35,7 +34,7 @@ class Controller(object):
 
         dt = time.time() - self.last_time
 
-        error = min(target_v.x, MAX_SPEED * ONE_MPH) - current_v.x
+        error = min(target_v.x, MAX_SPEED * 0.277778) - current_v.x
 
         throttle = self.throttle_pid.step(error, dt)
         
@@ -48,20 +47,20 @@ class Controller(object):
         # Torque = longitudinal force * wheel radius, which is supplied as brake value
         
         if error < 0: # Needs to decelerate
-            deceleration        = ((target_v.x - current_v.x) * 1000 / 3600) / dt # in m/sec
-	    if abs(deceleration) > abs(self.d_limit):
-                deceleration = self.d_limit  # Limited to decelartion limits
+
+            deceleration        = abs(error) / dt
+
+            if abs(deceleration) > abs(self.d_limit)*500:
+                deceleration = self.d_limit*500  # Limited to decelartion limits
             longitudinal_force  = self.v_mass * deceleration
             brake               = longitudinal_force * self.w_radius
-            throttle 		= 0.0
+            throttle        = 0.0
         else:
-            brake 		= 0.0
+            brake       = 0.0
 
         # Steering control is using Yaw Control..        
         steer = self.yaw_control.get_steering(target_v.x, target_omega.z, current_v.x)
         
         self.last_time = time.time()
-	
-	return throttle, brake, steer
-
-
+    
+        return throttle, brake, steer
