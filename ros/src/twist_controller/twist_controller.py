@@ -48,7 +48,7 @@ class Controller(object):
         # Torque = longitudinal force * wheel radius, which is supplied as brake value
         
         if error < 0: # Needs to decelerate
-            deceleration        = (target_v.x - current_v.x) / dt
+            deceleration        = ((target_v.x - current_v.x) / dt) / (1000/(60*60)) # in m/sec
 	    if abs(deceleration) > abs(self.d_limit):
                 deceleration = self.d_limit  # Limited to decelartion limits
             longitudinal_force  = self.v_mass * deceleration
