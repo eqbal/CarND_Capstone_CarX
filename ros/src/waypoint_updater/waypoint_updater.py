@@ -65,13 +65,13 @@ class WaypointUpdater(object):
                 chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < self.lookahead_wps)
                 if chk_point_distance:
                     distance_traffic_light = self.distance(self.final_waypoints, ii, point_dist + 1)
-                    if (distance_traffic_light < LIMIT_TRAFFIC_LIGHT) & (distance_traffic_light > 5):
+                    if (distance_traffic_light < LIMIT_TRAFFIC_LIGHT):
                         velocity = 0.0
-                    elif distance_traffic_light < LIMIT_DECELERATE:
-                        velocity = max(self.max_velocity - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
+                  #  elif distance_traffic_light < LIMIT_DECELERATE:
+                  #      velocity = max(self.max_velocity - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
 
-            #if ii % 10 == 0:
-            #    rospy.logwarn('i: %d : Vel: %.3f', ii, velocity)
+                #if ii % 10 == 0:
+                #    rospy.logwarn('i: %d : Vel: %.3f', ii, velocity)
 
             self.set_waypoint_velocity(self.final_waypoints, ii, velocity)
 
