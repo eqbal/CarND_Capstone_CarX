@@ -241,7 +241,7 @@ Please check out the link below for a video sample of the simulator.
 
 > Note that we used 40 Kmph for speed limit instead of the 10 MPH speed limit for CARLA for a better demonstration.
 
-[![](./imgs/Simulator_testing_of_CarX_team_Self_Driving_Car.gif)](https://www.youtube.com/watch?v=0G6BnhLnAd0&feature=youtu.be)
+[![](./imgs/Simulator_testing_of_CarX_team_Self_Driving_Car.gif)](https://www.youtube.com/watch?v=ABlWE6R7gDo&feature=youtu.be)
 
 
 ### Running code on CARLA
@@ -307,7 +307,4 @@ roslaunch launch/site.launch
 
 A video recording of this run is uploaded on youtube here
 
-[![](./imgs/Rosbag_play_of_CarX_team_Self_Driving_Car.gif)](https://www.youtube.com/watch?v=r7NIPb6AmjY0&feature=youtu.be)
-
-
-
+[![](./imgs/Rosbag_play_of_CarX_team_Self_Driving_Car.gif)](https://www.youtube.com/watch?v=wEFzopjE1kQ&feature=youtu.be)
