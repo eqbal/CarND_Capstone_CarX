@@ -6,7 +6,7 @@ from lowpass import LowPassFilter
 
 GAS_DENSITY = 2.858
 ONE_MPH     = 0.44704
-MAX_SPEED   = 40.0
+MAX_SPEED   = 10.0
 
 
 class Controller(object):
@@ -34,9 +34,9 @@ class Controller(object):
 
         dt = time.time() - self.last_time
 
-        # Assumed maximum speed is in Kmph
+        # Assumed maximum speed is in mph
 
-        error = min(target_v.x, MAX_SPEED * 0.277778) - current_v.x
+        error = min(target_v.x, MAX_SPEED * ONE_MPH) - current_v.x
 
         throttle = self.throttle_pid.step(error, dt)
 
