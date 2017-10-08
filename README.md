@@ -266,7 +266,7 @@ Assuming `Eqbal` is handling the `dbw_node`:
 
 ### Team Members:
 
-  - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com) - Team Lead
+  - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com) - Team Leader/ Project Planner/ Reviewer
 
 	> Eki has already written a book about Ruby 5.0. It’s currently
 sealed up. In three years, Matz is going to open the book to see if the
