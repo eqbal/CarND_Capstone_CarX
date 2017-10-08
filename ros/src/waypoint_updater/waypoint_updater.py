@@ -41,7 +41,6 @@ class WaypointUpdater(object):
         self.max_velocity = 1 # m/s
 
 
-
         # Subscribers
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -52,6 +51,7 @@ class WaypointUpdater(object):
 
         # Publisher
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
+
         rospy.spin()
 
 
@@ -74,7 +74,7 @@ class WaypointUpdater(object):
             #    rospy.logwarn('i: %d : Vel: %.3f', ii, velocity)
 
             self.set_waypoint_velocity(self.final_waypoints, ii, velocity)
-                
+
         self.Publish()
 
 
@@ -104,7 +104,7 @@ class WaypointUpdater(object):
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 )
         d = [] # temporary list to capture distance of waypoints from current position
         if self.waypoints:
-            for waypoint in self.waypoints.waypoints: 
+            for waypoint in self.waypoints.waypoints:
                 d.append(dl(waypoint.pose.pose.position, msg.pose.position))
             self.pos_point = np.argmin(d)
 
@@ -126,7 +126,7 @@ class WaypointUpdater(object):
             if self.traffic_point > self.pos_point:
                 self.red_light_ahead = True
             else:
-                self.red_light_ahead = False            
+                self.red_light_ahead = False
         else:
             self.traffic_point = None
             self.red_light_ahead = False
