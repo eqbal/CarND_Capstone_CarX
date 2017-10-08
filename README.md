@@ -88,7 +88,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 - The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
-- The brake value is based on multiple parametrs, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
+- The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
 
 	```
 	longitudinal_force = mass_of_car * acceleration (or deceleration)
@@ -131,7 +131,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- Changing the TL coordinate system from global to car's local one:
 
 		```python
-		piw = PyKDL.Vector(point_in_world.x,point_in_world.y,point_in_world.z)
+	   piw = PyKDL.Vector(point_in_world.x,point_in_world.y,point_in_world.z)
 	   R = PyKDL.Rotation.Quaternion(*rot)
 	   T = PyKDL.Vector(*trans)
 	   p_car = R*piw+T
