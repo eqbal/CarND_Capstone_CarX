@@ -98,6 +98,8 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	```
  
 	The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
+	
+	further refinements possible by adding the weight of fuel and the passengers to the mass of the vehicle while calculating the longitudinal force.
     
 - Traffic light detection node **(tl_detector)**
 
