@@ -233,7 +233,7 @@ To facilitate debugging of the system a visualization module was created for RVI
 
 4. Run the simulator
 
-The following link has video recorded and uploaded on youtube
+The following link has he video recording of the simulator
 
 https://www.youtube.com/watch?v=0G6BnhLnAd0&feature=youtu.be
 
