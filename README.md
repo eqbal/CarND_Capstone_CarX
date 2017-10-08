@@ -233,6 +233,11 @@ To facilitate debugging of the system a visualization module was created for RVI
 
 4. Run the simulator
 
+The following link has video recorded and uploaded on youtube
+
+https://www.youtube.com/watch?v=0G6BnhLnAd0&feature=youtu.be
+
+
 ### Running code on CARLA
 
 In order to run the code on CARLA, it is necessary to use a different classifier. At the moment we are using an SVM in the simulator environment, while a FCN is used to detect traffic lights in the real world.
@@ -258,31 +263,27 @@ Assuming `Eqbal` is handling the `dbw_node`:
 
 - Don't apply the changes directly to `master`
 
-### Task break down table
-To break down tasks and manage our task we'll be using [Github Project management](https://github.com/marketplace/category/project-management) check out the link below:
-
-https://github.com/eqbal/CarND_Capstone_CarX/projects/1
 
 ### Team Members:
 
-  - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com)
+  - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com) - Team Lead
 
 	> Eki has already written a book about Ruby 5.0. It’s currently
 sealed up. In three years, Matz is going to open the book to see if the
 language design team got it right.
 
-  - Jaime Blasco (pinoch0@gmail.com)
+  - Jaime Blasco (pinoch0@gmail.com) - TL Detection / Classification
 	> Jaime's addition operator doesn't commute; it teleports to
 where he needs it to be
 
-  - Dimitrios Mavridis (dmavridis@gmail.com)
+  - Dimitrios Mavridis (dmavridis@gmail.com) - Waypoint Updates/ Simulation
 
 	> Dimitrios's code doesn't follow a coding convention. It is the coding convention.
 
-  - Mani Srinivasan (srnimani@gmail.com)
+  - Mani Srinivasan (srnimani@gmail.com) - DBW Node
 	> Mani does not use revision control software. None of his code has ever needed revision.
 
-  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com)
+  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com) - TL Detection / Classification
 	> Volodymyr's coding reputation is only as modest as it is because of integer overflow (SQL Server does not have a datatype large enough)
 
 ### Real world testing
@@ -301,4 +302,10 @@ rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
 cd CarND-Capstone/ros
 roslaunch launch/site.launch
 ```
+
+A video recording of this run is uploaded on youtube here
+
+https://www.youtube.com/watch?v=r7NIPb6AmjY&feature=youtu.be
+
+
 
