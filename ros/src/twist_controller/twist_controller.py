@@ -33,6 +33,8 @@ class Controller(object):
             return 0.0, 0.0, 0.0
 
         dt = time.time() - self.last_time
+        
+        # Assumed maximum speed is in Kmph
 
         error = min(target_v.x, MAX_SPEED * 0.277778) - current_v.x
 
@@ -45,6 +47,10 @@ class Controller(object):
         # Brake value is in N/m and is calculated using car mass, acceleration and wheel radius
         # longitudinal force = mass of car * acceleration (or deceleration)
         # Torque = longitudinal force * wheel radius, which is supplied as brake value
+        #
+        # Further refinements can be done by adding the mass of fuel and the passengers to the mass 
+        # of the car in real world scenario
+        #
         
         if error < 0: # Needs to decelerate
 
