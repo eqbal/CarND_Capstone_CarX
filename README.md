@@ -244,11 +244,7 @@ Please check out the link below for a video sample of the simulator.
 
 ### Running code on CARLA
 
-In order to run the code on CARLA, it is necessary to use a different classifier. At the moment we are using an SVM in the simulator environment, while a FCN is used to detect traffic lights in the real world.
-
-Therefore, it is necessary to download the trained FCN network (based on VGG) snapshot.
-
-Due to the size of the file, it cannot be hosted in GitHub, so please use the following link to download: [Trained FCN snapshot](some_url_after_checking_with_carx_team).
+In the project, the classification is done based on the color - the traffic light colors are very saturated what makes it easy to detect the state on the background. In order to run the code on CARLA, it is necessary to use a different classifier, a more intelligent classifier should be used (e.g. a neural network similar to YOLO or SSD, or a fully convolutional network)
 
 
 ### Collaboration
