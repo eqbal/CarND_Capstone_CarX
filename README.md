@@ -272,18 +272,18 @@ Assuming `Eqbal` is handling the `dbw_node`:
 sealed up. In three years, Matz is going to open the book to see if the
 language design team got it right.
 
-  - Jaime Blasco (pinoch0@gmail.com) - TL Detection / Classification
+  - Jaime Blasco (pinoch0@gmail.com) - Contributed to TL Detection / Classification
 	> Jaime's addition operator doesn't commute; it teleports to
 where he needs it to be
 
-  - Dimitrios Mavridis (dmavridis@gmail.com) - Waypoint Updates/ Simulation
+  - Dimitrios Mavridis (dmavridis@gmail.com) - Contributed to Waypoint Updates/ Simulation
 
 	> Dimitrios's code doesn't follow a coding convention. It is the coding convention.
 
-  - Mani Srinivasan (srnimani@gmail.com) - DBW Node
+  - Mani Srinivasan (srnimani@gmail.com) - Contributed to DBW Node
 	> Mani does not use revision control software. None of his code has ever needed revision.
 
-  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com) - TL Detection / Classification
+  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com) - Contributed to TL Detection / Classification
 	> Volodymyr's coding reputation is only as modest as it is because of integer overflow (SQL Server does not have a datatype large enough)
 
 ### Real world testing
