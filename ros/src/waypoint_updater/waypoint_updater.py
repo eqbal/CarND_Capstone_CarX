@@ -24,7 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 150 # Number of waypoints we will publish. You can change this number
-LIMIT_TRAFFIC_LIGHT = 20 # [in m ] when red traffic light ahead, act when closer than this distance
+# LIMIT_TRAFFIC_LIGHT = 20 # [in m ] when red traffic light ahead, act when closer than this distance
 LIMIT_DECELERATE = 40 # distance to start decelerating
 MAX_DECEL = 5 # max deceleration in m/s^2. this is just an indicative value from the loader node
 
@@ -37,9 +37,10 @@ class WaypointUpdater(object):
         self.pos_point = None # Stores the waypoint index the car is closest to
         self.traffic_point = -1 # Stores the waypoint index of the closest traffic light
         self.red_light_ahead = False
+#        self.yellow_light_ahead = False
         self.lookahead_wps = 0
         self.max_velocity = 1 # m/s
-
+        self.limit_traffic_ahead = 1 # [in m ] when red traffic light ahead, act when closer than this distance
 
         # Subscribers
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -65,13 +66,8 @@ class WaypointUpdater(object):
                 chk_point_distance = (ii <  point_dist) & (point_dist > 1) & (point_dist < self.lookahead_wps)
                 if chk_point_distance:
                     distance_traffic_light = self.distance(self.final_waypoints, ii, point_dist + 1)
-                    if (distance_traffic_light < LIMIT_TRAFFIC_LIGHT):
+                    if (distance_traffic_light < self.limit_traffic_ahead):
                         velocity = 0.0
-                  #  elif distance_traffic_light < LIMIT_DECELERATE:
-                  #      velocity = max(self.max_velocity - math.sqrt(2*MAX_DECEL*distance_traffic_light)* 3.6, 0)
-
-                #if ii % 10 == 0:
-                #    rospy.logwarn('i: %d : Vel: %.3f', ii, velocity)
 
             self.set_waypoint_velocity(self.final_waypoints, ii, velocity)
 
@@ -95,7 +91,7 @@ class WaypointUpdater(object):
         # rospy.logwarn("Total waypoints {}".format(self.waypoints_size))
         self.max_velocity = self.get_waypoint_velocity(waypoints.waypoints[0]) # m/s
         # rospy.logwarn("Max Velocity {}".format(self.max_velocity))
-
+        self.limit_traffic_ahead = 1.8*self.max_velocity # empirical expression, for larger speed start deceleration earlier
 
     def pose_cb(self, msg):
         '''
@@ -122,11 +118,9 @@ class WaypointUpdater(object):
         Reads amd processes a traffic light signal
         '''
         if (msg.data >= 0):
+#            rospy.logwarn(msg)
             self.traffic_point = msg.data
-            if self.traffic_point > self.pos_point:
-                self.red_light_ahead = True
-            else:
-                self.red_light_ahead = False
+            self.red_light_ahead = True
         else:
             self.traffic_point = None
             self.red_light_ahead = False
