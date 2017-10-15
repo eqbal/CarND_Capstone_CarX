@@ -240,7 +240,7 @@ The following link has he video recording of the simulator
 Please check out the link below for a video sample of the simulator. 
 
 
-[![](./imgs/Simulator_testing_of_CarX_team_Self_Driving_Car.gif)](https://youtu.be/rBYisFvp-Hs)
+
 
 
 ### Running code on CARLA
