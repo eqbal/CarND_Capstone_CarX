@@ -239,7 +239,7 @@ The following link has he video recording of the simulator
 
 Please check out the link below for a video sample of the simulator. 
 
-
+![https://youtu.be/rBYisFvp-Hs](https://youtu.be/rBYisFvp-Hs)
 
 
 
