@@ -241,7 +241,7 @@ Please check out the link below for a video sample of the simulator.
 
 ![https://youtu.be/rBYisFvp-Hs](https://youtu.be/rBYisFvp-Hs)
 
-
+[![](./imgs/Kazam_screencast_00001.gif)](https://youtu.be/rBYisFvp-Hs)
 
 ### Running code on CARLA
 
