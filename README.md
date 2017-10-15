@@ -239,9 +239,8 @@ The following link has he video recording of the simulator
 
 Please check out the link below for a video sample of the simulator. 
 
-> Note that we used 40 Kmph for speed limit instead of the 10 MPH speed limit for CARLA for a better demonstration.
 
-[![](./imgs/Simulator_testing_of_CarX_team_Self_Driving_Car.gif)](https://www.youtube.com/watch?v=ABlWE6R7gDo&feature=youtu.be)
+[![](./imgs/Simulator_testing_of_CarX_team_Self_Driving_Car.gif)](https://youtu.be/rBYisFvp-Hs)
 
 
 ### Running code on CARLA
