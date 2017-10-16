@@ -29,9 +29,9 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 #### Waypoint Updater node (**waypoint_updater**)
 
-	This node publishes the next **200** waypoints that are closest to vehicle's current location and are ahead of the vehicle. This node also considers obstacles and traffic lights to set the velocity for each waypoint.
+This node publishes the next **200** waypoints that are closest to vehicle's current location and are ahead of the vehicle. This node also considers obstacles and traffic lights to set the velocity for each waypoint.
 
-	This node subscribes to following topics:
+This node subscribes to following topics:
 
 	- **base_waypoints**: Waypoints for the whole track are published to this topic. This publication is a one-time only operation. The waypoint updater node receives these waypoints, stores them for later use and uses these points to extract the next 200 points ahead of the vehicle.
 
@@ -40,9 +40,9 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- **current_pose**: To receive current position of vehicle.
 
 
-	The functionality of the `waypoint updater` node is to process the track waypoints that are provided from the `waypoint_loader` and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
+The functionality of the `waypoint updater` node is to process the track waypoints that are provided from the `waypoint_loader` and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
 
-	For the described operation the following steps are followed, provided that the track waypoints have already been loaded:
+For the described operation the following steps are followed, provided that the track waypoints have already been loaded:
 
 	- __Identify the car's position in the car__ (`pose_cb`) :
 	Knowing the car's position in (x,y) coordinates, the closent track point is returned as an index ranked by its Euclidean distance.  Then the next few points ahead (defined by LOOKAHEAD_WPS constant) will be the final uprocessed waypoints.
@@ -53,42 +53,42 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 		- __Traffic light red and close__: The car is required to stop. The velocity is set to 0
 		- __Traffic light red within deceleration distance__: Car is approaching the traffic light but is not so close yet. Velocity is linearly dropping.
 
-	After the waypoints are updated they are published and are send through the waypoint follower to the `twist controller` which is implementing the actuator commands.
-	This node publishes to following topics:
+After the waypoints are updated they are published and are send through the waypoint follower to the `twist controller` which is implementing the actuator commands.
+This node publishes to following topics:
 
 	- **final_waypoints**: Selected 200 waypoints including their velocity information are published to this topic.
 
 
 #### Twist Controller Node **(dbw_node)**
 
-	This node is responsible for vehicle control (acceleration, steering, brake).
+This node is responsible for vehicle control (acceleration, steering, brake).
 
-	This node subscribes to the following topics:
+This node subscribes to the following topics:
 
 	- **dbw_enabled**: Indicates if the car is under dbw or driver control.
 	- **current_velocity**: To receive the current velocity of the vehicle.
 	- **twist_cmd**: Target vehicle linear and angular velocities in the form of twist commands are published to this topic.
 
-	This node publishes to following topics:
+This node publishes to following topics:
 
 	- **steering_cmd**: Steering commands are published to this topic.
 	- **throttle_cmd**: Throttle commands are published to this topic.
 	- **brake_cmd**: Brake commands are published to this topic.
 
-	To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (as coded in twist_controller.py).
+To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (as coded in twist_controller.py).
 	
-	The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
+The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
 
 	```
 	 kp   = 0.3
 	 ki   = 0.003
 	 kd   = 4.0
 	```
-	The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
+The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
 
-        The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
+The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
-        The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
+The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
 
 	```
 	longitudinal_force = mass_of_car * acceleration (or deceleration)
@@ -97,13 +97,13 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	    
 	```
  
-	The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
-	
-	Further refinements possible by adding the weight of fuel and the passengers to the mass of the vehicle while calculating the longitudinal force.
+The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
+
+Further refinements possible by adding the weight of fuel and the passengers to the mass of the vehicle while calculating the longitudinal force.
     
 #### Traffic light detection node **(tl_detector)**
 
-	The closest waypoint is found using shortest distance criteria. After the nearest TL is found, it is checked if we passed it by looking at the angle between the car's heading vector and a vector pointing from the car the TL location. The angle is found from the scalar product of these two vectors. If this angle is greater than pi/2, the stop-line is considered to be passed and the corresponding stop-line waypoint is not published anymore.
+The closest waypoint is found using shortest distance criteria. After the nearest TL is found, it is checked if we passed it by looking at the angle between the car's heading vector and a vector pointing from the car the TL location. The angle is found from the scalar product of these two vectors. If this angle is greater than pi/2, the stop-line is considered to be passed and the corresponding stop-line waypoint is not published anymore.
 
 	```python
 	# let's use scalar product to find the angle between the car orientation vector and car/base_point vector
@@ -126,7 +126,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
             best_i = i
 	```
 
-	The projection was done in 2 stages:
+The projection was done in 2 stages:
 	
 	- Changing the TL coordinate system from global to car's local one:
 
@@ -151,13 +151,13 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
         return (int(x), int(y))
 		```
-	The focal distance and offset pinhole model parameters were tuned to match the TL with its image. For the tuning, the pinhole project properties were utilized: the offsets were selected to match the TL coordinate to its image when the car was far away from the TL and the focal length was tuned for closer TL positions.
+The focal distance and offset pinhole model parameters were tuned to match the TL with its image. For the tuning, the pinhole project properties were utilized: the offsets were selected to match the TL coordinate to its image when the car was far away from the TL and the focal length was tuned for closer TL positions.
 
-	Finally, the image is cropped around the found TF projection to simplify the classification task.
+Finally, the image is cropped around the found TF projection to simplify the classification task.
 
 #### TLClassifier class **(tl_classifier)**
 
-	Knowing the coordinates of the traffic light in the world coordinate system together with accurate transformation for the car coordinate system makes the traffic detection problem trivial. In the project, the classification is done based on the color - the traffic light colors are very saturated what makes it easy to detect the state on the background. In real conditions, a more intelligent classifier should be used (e.g. a neural network similar to YOLO or SSD, or a fully convolutional network)
+Knowing the coordinates of the traffic light in the world coordinate system together with accurate transformation for the car coordinate system makes the traffic detection problem trivial. In the project, the classification is done based on the color - the traffic light colors are very saturated what makes it easy to detect the state on the background. In real conditions, a more intelligent classifier should be used (e.g. a neural network similar to YOLO or SSD, or a fully convolutional network)
 	
 	```python
         hsv_img = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
