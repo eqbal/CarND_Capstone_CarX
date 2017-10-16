@@ -27,7 +27,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 ### ROS Nodes Description
 
 
-- Waypoint Updater node (**waypoint_updater**)
+#### Waypoint Updater node (**waypoint_updater**)
 
 	This node publishes the next **200** waypoints that are closest to vehicle's current location and are ahead of the vehicle. This node also considers obstacles and traffic lights to set the velocity for each waypoint.
 
@@ -59,7 +59,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	- **final_waypoints**: Selected 200 waypoints including their velocity information are published to this topic.
 
 
-- Twist Controller Node **(dbw_node)**
+#### Twist Controller Node **(dbw_node)**
 
 	This node is responsible for vehicle control (acceleration, steering, brake).
 
@@ -86,9 +86,9 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 	```
 	The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
 
-- The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
+        The `Yaw Controller` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
 
-- The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
+        The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'.  Brake is applied only if the target velocity is less than the current velocity. The brake value is in N/m and the formulae used for calculting the brake is as follows.
 
 	```
 	longitudinal_force = mass_of_car * acceleration (or deceleration)
@@ -99,9 +99,9 @@ Using the Robot Operating System (ROS), each team member has developed and maint
  
 	The torque is supplied as the brake value in N/m limited by the decel_limit parameter.
 	
-	further refinements possible by adding the weight of fuel and the passengers to the mass of the vehicle while calculating the longitudinal force.
+	Further refinements possible by adding the weight of fuel and the passengers to the mass of the vehicle while calculating the longitudinal force.
     
-- Traffic light detection node **(tl_detector)**
+#### Traffic light detection node **(tl_detector)**
 
 	The closest waypoint is found using shortest distance criteria. After the nearest TL is found, it is checked if we passed it by looking at the angle between the car's heading vector and a vector pointing from the car the TL location. The angle is found from the scalar product of these two vectors. If this angle is greater than pi/2, the stop-line is considered to be passed and the corresponding stop-line waypoint is not published anymore.
 
@@ -155,7 +155,7 @@ Using the Robot Operating System (ROS), each team member has developed and maint
 
 	Finally, the image is cropped around the found TF projection to simplify the classification task.
 
-- TLClassifier class **(tl_classifier)**
+#### TLClassifier class **(tl_classifier)**
 
 	Knowing the coordinates of the traffic light in the world coordinate system together with accurate transformation for the car coordinate system makes the traffic detection problem trivial. In the project, the classification is done based on the color - the traffic light colors are very saturated what makes it easy to detect the state on the background. In real conditions, a more intelligent classifier should be used (e.g. a neural network similar to YOLO or SSD, or a fully convolutional network)
 	
@@ -239,8 +239,6 @@ The following link has he video recording of the simulator
 
 Please check out the link below for a video sample of the simulator. 
 
-![https://youtu.be/rBYisFvp-Hs](https://youtu.be/rBYisFvp-Hs)
-
 [![](./imgs/Kazam_screencast_00001.gif)](https://youtu.be/rBYisFvp-Hs)
 
 ### Running code on CARLA
@@ -269,23 +267,13 @@ Assuming `Eqbal` is handling the `dbw_node`:
 
   - [Eqbal Quran](www.eqbalq.com) (info@eqbalq.com) - Team Leader/ Project Planner/ Reviewer
 
-	> Eki has already written a book about Ruby 5.0. It’s currently
-sealed up. In three years, Matz is going to open the book to see if the
-language design team got it right.
+  - Jaime Blasco (pinoch0@gmail.com) - Contributed to TL Detection / Full system testing and finetuning
 
-  - Jaime Blasco (pinoch0@gmail.com) - Contributed to TL Detection / Classification
-	> Jaime's addition operator doesn't commute; it teleports to
-where he needs it to be
-
-  - Dimitrios Mavridis (dmavridis@gmail.com) - Contributed to Waypoint Updates/ Simulation
-
-	> Dimitrios's code doesn't follow a coding convention. It is the coding convention.
+  - Dimitrios Mavridis (dmavridis@gmail.com) - Contributed to Waypoint Updates / Full system testing and finetuning
 
   - Mani Srinivasan (srnimani@gmail.com) - Contributed to DBW Node
-	> Mani does not use revision control software. None of his code has ever needed revision.
 
-  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com) - Contributed to TL Detection / Classification
-	> Volodymyr's coding reputation is only as modest as it is because of integer overflow (SQL Server does not have a datatype large enough)
+  - Volodymyr Seliuchenko (volodymyr.seliuchenko@gmail.com) - Contributed to TL Detection / Classification / Visualization module
 
 ### Real world testing
 
